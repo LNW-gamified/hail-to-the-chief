@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="8" fill="#0A1628"/>
+  <!-- Eagle body -->
+  <ellipse cx="32" cy="36" rx="10" ry="12" fill="#C9A84C"/>
+  <!-- Eagle head -->
+  <circle cx="32" cy="20" r="7" fill="#C9A84C"/>
+  <!-- Beak -->
+  <polygon points="39,20 43,22 39,24" fill="#C9A84C"/>
+  <!-- Left wing -->
+  <ellipse cx="18" cy="32" rx="12" ry="6" fill="#C9A84C" transform="rotate(-20 18 32)"/>
+  <!-- Right wing -->
+  <ellipse cx="46" cy="32" rx="12" ry="6" fill="#C9A84C" transform="rotate(20 46 32)"/>
+  <!-- Tail -->
+  <polygon points="24,48 32,44 40,48 36,56 28,56" fill="#C9A84C"/>
+  <!-- Shield on chest -->
+  <rect x="27" y="30" width="10" height="12" rx="1" fill="#B22234"/>
+  <rect x="29" y="30" width="2" height="12" fill="#F5F0E8"/>
+  <rect x="33" y="30" width="2" height="12" fill="#F5F0E8"/>
+</svg>
