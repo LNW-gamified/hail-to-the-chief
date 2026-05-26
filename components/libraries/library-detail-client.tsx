@@ -160,6 +160,7 @@ function MarkVisitedModal({
       .single();
 
     if (err) { setError(err.message); setLoading(false); return; }
+    try { localStorage.setItem('hailToTheChief.newStamp', locationId); } catch { /* ignore */ }
     onSuccess({
       id: data.id,
       visitDate: data.visit_date,
