@@ -84,6 +84,12 @@ export type NearbyLocation = {
   distanceMiles: number;
 };
 
+export type HistoricDay = {
+  fact: string;
+  year: number | null;
+  category: string;
+};
+
 type Tab = 'visit' | 'plan' | 'dossier' | 'library';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -652,16 +658,23 @@ function NearbySitesSection({ nearby }: { nearby: NearbyLocation[] }) {
 
 // ── main export ────────────────────────────────────────────────────────────────
 
+const HISTORIC_DAY_EMOJI: Record<string, string> = {
+  inauguration: '🏛️', legislation: '📜', war: '⚔️',
+  achievement: '🌟', death: '✝️', birth: '👶', scandal: '📰',
+};
+
 export default function LibraryDetailClient({
   location,
   initialVisits,
   bestTriviaScore,
   nearbyLocations,
+  historicDay,
 }: {
   location: LocationData;
   initialVisits: VisitData[];
   bestTriviaScore: { score: number; completedAt: string } | null;
   nearbyLocations: NearbyLocation[];
+  historicDay?: HistoricDay | null;
 }) {
   const router = useRouter();
   const [visits, setVisits] = useState<VisitData[]>(initialVisits);
@@ -851,6 +864,28 @@ export default function LibraryDetailClient({
         </div>
 
         <div className="px-6 md:px-8 space-y-6 max-w-4xl mx-auto mt-6">
+
+          {/* ── historic day banner ── */}
+          {historicDay && (
+            <div className="relative overflow-hidden bg-gold/8 border border-gold/30 rounded-xl px-4 py-3">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gold/15 flex items-center justify-center shrink-0">
+                  <span>{HISTORIC_DAY_EMOJI[historicDay.category] ?? '📅'}</span>
+                </div>
+                <div>
+                  <p className="font-mono text-[9px] text-gold/60 tracking-[0.2em] mb-1">
+                    HISTORIC DAY · {historicDay.category.toUpperCase()}
+                  </p>
+                  <p className="font-serif text-sm text-cream/80 leading-relaxed">
+                    {historicDay.fact}
+                  </p>
+                  {historicDay.year && (
+                    <p className="font-mono text-[10px] text-gold/40 mt-1">— {historicDay.year}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── quick stats bar ── */}
           {p && (

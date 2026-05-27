@@ -5,6 +5,7 @@ import LibraryDetailClient, {
   type PresidentData,
   type VisitData,
   type NearbyLocation,
+  type HistoricDay,
 } from '@/components/libraries/library-detail-client';
 
 function one<T>(v: T | T[] | null | undefined): T | null {
@@ -146,6 +147,29 @@ export default async function LibraryDetailPage({
     weatherWind:       v.weather_wind,
   }));
 
+  // Historic Day: today's on_this_day facts for this president
+  const todayDate = new Date();
+  let historicDay: HistoricDay | null = null;
+  if (president) {
+    const { data: hdRows } = await supabase
+      .from('on_this_day')
+      .select('fact, year, category')
+      .eq('president_id', president.id)
+      .eq('month', todayDate.getMonth() + 1)
+      .eq('day', todayDate.getDate())
+      .limit(3);
+
+    const PRIORITY: Record<string, number> = {
+      inauguration: 0, legislation: 1, war: 2, achievement: 3, death: 4, birth: 5, scandal: 6,
+    };
+    const best = (hdRows ?? [])
+      .slice()
+      .sort((a, b) => (PRIORITY[a.category ?? ''] ?? 99) - (PRIORITY[b.category ?? ''] ?? 99))[0];
+    if (best) {
+      historicDay = { fact: best.fact, year: best.year ?? null, category: best.category ?? '' };
+    }
+  }
+
   // Best trivia score for this president
   let bestTriviaScore: { score: number; completedAt: string } | null = null;
   if (president) {
@@ -196,6 +220,7 @@ export default async function LibraryDetailPage({
       initialVisits={initialVisits}
       bestTriviaScore={bestTriviaScore}
       nearbyLocations={nearbyLocations}
+      historicDay={historicDay}
     />
   );
 }

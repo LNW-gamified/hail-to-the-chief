@@ -5,6 +5,7 @@ import { getRank } from '@/lib/ranks';
 import ProgressRing from '@/components/home/progress-ring';
 import XpBar from '@/components/home/xp-bar';
 import HomeLogVisitButton from '@/components/home/log-visit-button';
+import OnThisDayCarousel, { type OnThisDayEntry } from '@/components/home/on-this-day-carousel';
 
 const TOTAL_NARA = 15;
 
@@ -61,7 +62,7 @@ export default async function HomePage() {
     { data: profile },
     { data: rawVisits },
     { data: activeTripRows },
-    { data: onThisDay },
+    { data: onThisDayRows },
     { data: topPresidents },
     { data: rawRecent },
   ] = await Promise.all([
@@ -83,11 +84,10 @@ export default async function HomePage() {
 
     supabase
       .from('on_this_day')
-      .select('fact, year, category, presidents(name, number)')
+      .select('fact, year, category, presidents(name, number, portrait_url)')
       .eq('month', today.getMonth() + 1)
       .eq('day', today.getDate())
-      .limit(1)
-      .maybeSingle(),
+      .limit(3),
 
     supabase
       .from('presidents')
@@ -182,8 +182,30 @@ export default async function HomePage() {
   const rank = getRank(totalXp);
 
   // ── on this day ───────────────────────────────────────────────────────────
-  const otdPres = one((onThisDay as { presidents?: unknown } | null)?.presidents as never) as
-    { name?: string; number?: number } | null;
+  const CATEGORY_PRIORITY: Record<string, number> = {
+    inauguration: 0, legislation: 1, war: 2, achievement: 3, death: 4, birth: 5, scandal: 6,
+  };
+
+  const otdEntries: OnThisDayEntry[] = (onThisDayRows ?? [])
+    .slice()
+    .sort((a, b) => {
+      const pa = CATEGORY_PRIORITY[(a.category as string) ?? ''] ?? 99;
+      const pb = CATEGORY_PRIORITY[(b.category as string) ?? ''] ?? 99;
+      return pa - pb;
+    })
+    .map(row => {
+      const pres = one(row.presidents as never) as {
+        name?: string; number?: number; portrait_url?: string;
+      } | null;
+      return {
+        fact: row.fact as string,
+        year: (row.year as number | null) ?? null,
+        category: (row.category as string) ?? '',
+        presidentName: pres?.name ?? null,
+        presidentNumber: pres?.number ?? null,
+        portraitUrl: pres?.portrait_url ?? null,
+      };
+    });
 
   // ── recent visits ─────────────────────────────────────────────────────────
   const recent = (rawRecent ?? []).map(v => {
@@ -427,25 +449,7 @@ export default async function HomePage() {
               <p className="font-mono text-[10px] text-cream/30 tracking-widest mb-3">
                 ON THIS DAY IN PRESIDENTIAL HISTORY
               </p>
-              {onThisDay ? (
-                <>
-                  <p className="font-serif text-base text-cream/85 leading-relaxed">
-                    {onThisDay.fact}
-                  </p>
-                  {onThisDay.year && (
-                    <p className="font-mono text-xs text-gold/60 mt-2">— {onThisDay.year}</p>
-                  )}
-                  {otdPres?.name && (
-                    <p className="font-mono text-xs text-cream/40 mt-1">
-                      President {otdPres.name}
-                    </p>
-                  )}
-                </>
-              ) : (
-                <p className="font-serif text-cream/30 italic">
-                  No intelligence on record for today. Check back tomorrow.
-                </p>
-              )}
+              <OnThisDayCarousel entries={otdEntries} />
             </div>
 
             <div className="border-t border-border pt-3">
