@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
 import { ERA_COLORS, ERA_LABELS, ordinal } from '@/lib/era';
+import { PortraitImg } from '@/components/ui/portrait-img';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -795,7 +796,7 @@ export default function LibraryDetailClient({
     router.refresh();
   }
 
-  const heroBackground = p?.portraitUrl ?? location.imageUrl;
+  const initials = [p?.firstName?.[0], p?.lastName?.[0]].filter(Boolean).join('');
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'visit',   label: 'Your Visit',     icon: <Calendar size={14} />  },
@@ -817,40 +818,37 @@ export default function LibraryDetailClient({
       <div className="pb-10">
 
         {/* ── hero ── */}
-        <div className="relative h-72 md:h-80 overflow-hidden">
-          {/* blurred background */}
-          {heroBackground ? (
-            <div
-              className="absolute inset-0 scale-110"
-              style={{
-                backgroundImage: `url(${heroBackground})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center top',
-                filter: 'blur(12px)',
-              }}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-navy-secondary" />
-          )}
-          {/* dark overlay */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(10,22,40,0.55) 0%, rgba(10,22,40,0.88) 100%)',
-            }}
-          />
-          {/* era color accent bottom */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-[3px]"
-            style={{ backgroundColor: eraColor }}
-          />
+        {/* outer wrapper: no overflow-hidden so portrait can overlap below */}
+        <div className="relative" style={{ height: 380 }}>
 
-          {/* Hero content */}
-          <div className="relative h-full flex flex-col justify-end px-6 md:px-8 pb-6">
-            {/* Era badge */}
+          {/* building photo bg — clipped inside hero */}
+          <div className="absolute inset-0 overflow-hidden">
+            {location.imageUrl ? (
+              <img
+                src={location.imageUrl}
+                alt={location.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-full h-full"
+                style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }}
+              />
+            )}
+            {/* dark gradient so text is readable */}
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A1628 100%)' }}
+            />
+            {/* era accent line */}
+            <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: eraColor }} />
+          </div>
+
+          {/* text overlay — bottom-left, right-padded to clear portrait */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5 pr-36">
             {p?.era && (
               <span
-                className="font-mono text-[12px] font-semibold px-2.5 py-1 rounded-full mb-3 self-start"
+                className="inline-block font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full mb-2"
                 style={{
                   backgroundColor: eraColor + '4D',
                   color: '#F5F0E8',
@@ -860,18 +858,14 @@ export default function LibraryDetailClient({
                 {ERA_LABELS[p.era] ?? p.era}
               </span>
             )}
-
-            {/* Name */}
-            <h1 className="font-display text-4xl md:text-5xl text-cream leading-tight mb-1">
+            <h1 className="font-display text-4xl md:text-5xl text-white leading-tight mb-1">
               {p?.name ?? location.name}
             </h1>
             {p && (
-              <p className="font-mono text-sm mb-4" style={{ color: '#8BBBD4' }}>
+              <p className="font-mono text-sm mb-3" style={{ color: '#C9A84C' }}>
                 {ordinal(p.number)} President of the United States
               </p>
             )}
-
-            {/* Badge row */}
             <div className="flex flex-wrap gap-2">
               {p && (
                 <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
@@ -890,6 +884,56 @@ export default function LibraryDetailClient({
               )}
             </div>
           </div>
+
+          {/* portrait circle — bottom-right, half-overlapping below hero */}
+          <div
+            className="absolute z-50"
+            style={{ bottom: 0, right: 20, transform: 'translateY(50%)' }}
+          >
+            <div
+              className="w-[120px] h-[120px] rounded-full overflow-hidden"
+              style={{
+                border: '4px solid #C9A84C',
+                boxShadow: '0 0 20px rgba(201, 168, 76, 0.5)',
+              }}
+            >
+              <PortraitImg
+                src={p?.portraitUrl}
+                alt={p?.name ?? ''}
+                className="w-full h-full object-cover object-top"
+                fallback={
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    style={{ background: eraColor + '33' }}
+                  >
+                    <span className="font-mono text-2xl font-bold" style={{ color: eraColor }}>
+                      {initials}
+                    </span>
+                  </div>
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── mark visited — full-width button below hero, clearing portrait overlap ── */}
+        <div className="px-4 pt-20 pb-2">
+          {!visited ? (
+            <button
+              onClick={() => setShowModal(true)}
+              className="w-full flex items-center justify-center gap-2 font-mono text-sm font-bold py-3.5 rounded-xl transition-all hover:brightness-110 active:scale-[0.99]"
+              style={{ background: '#C9A84C', color: '#0A1628' }}
+            >
+              <Check size={16} /> Mark Visited
+            </button>
+          ) : (
+            <div
+              className="w-full flex items-center justify-center gap-2 font-mono text-sm font-bold py-3.5 rounded-xl"
+              style={{ background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.35)', color: '#C9A84C' }}
+            >
+              <Check size={16} /> Visited
+            </div>
+          )}
         </div>
 
         <div className="px-6 md:px-8 space-y-6 max-w-4xl mx-auto mt-6">
@@ -914,21 +958,8 @@ export default function LibraryDetailClient({
             </div>
           )}
 
-          {/* ── action buttons ── */}
+          {/* ── secondary actions ── */}
           <div className="flex gap-3 items-center">
-            {!visited ? (
-              <button
-                onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 bg-gold text-navy font-mono text-sm font-bold px-6 py-3 rounded-xl hover:bg-gold/90 transition-colors"
-              >
-                <Check size={16} /> Mark Visited
-              </button>
-            ) : (
-              <div className="flex items-center gap-2 bg-gold/15 border border-gold/30 text-gold font-mono text-sm font-bold px-5 py-3 rounded-xl">
-                <Check size={16} /> Visited
-              </div>
-            )}
-
             <Link
               href={`/trips?location=${location.id}`}
               className="flex items-center gap-2 border border-border text-cream/60 font-mono text-sm px-5 py-3 rounded-xl hover:border-gold/40 hover:text-gold transition-colors"
