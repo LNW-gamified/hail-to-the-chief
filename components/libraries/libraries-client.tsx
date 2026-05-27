@@ -83,17 +83,18 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
         ].join(' ')}
         style={visited ? { boxShadow: '0 0 18px rgba(201,168,76,0.10)' } : undefined}
       >
-        <div className="flex" style={{ minHeight: 120 }}>
+        <div className="flex" style={{ minHeight: 140 }}>
 
           {/* Portrait rectangle — full card height, left side */}
           <div
             className="relative shrink-0 overflow-hidden"
-            style={{ width: 80, borderRight: '2px solid #C9A84C' }}
+            style={{ width: 110, borderRight: '2px solid #C9A84C' }}
           >
             <PortraitImg
               src={p?.portraitUrl}
               alt={p?.name ?? ''}
-              className="absolute inset-0 w-full h-full object-cover object-top"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center top' }}
               fallback={
                 <div
                   className="absolute inset-0 flex items-center justify-center"
