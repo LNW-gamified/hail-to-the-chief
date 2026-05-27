@@ -37,8 +37,8 @@ type Filter = 'all' | 'nara' | 'sites' | 'visited' | 'not_yet';
 type Sort   = 'chronological' | 'geographical' | 'recently_visited';
 
 const FILTER_LABELS: Record<Filter, string> = {
-  all:      'All Locations',
   nara:     'NARA (15)',
+  all:      'All Locations',
   sites:    'Historic Sites',
   visited:  'Visited',
   not_yet:  'Not Yet',
