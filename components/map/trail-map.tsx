@@ -224,14 +224,14 @@ function BottomSheet({
                 <MapPin size={13} className="text-gold/60 shrink-0" />
                 <div className="min-w-0">
                   <p className="font-serif text-sm text-cream/80 truncate">{entry.locationName}</p>
-                  <p className="font-mono text-[11px] text-cream/35">{entry.city}, {entry.state}</p>
+                  <p className="font-mono text-[11px]" style={{ color: '#8BBBD4' }}>{entry.city}, {entry.state}</p>
                 </div>
                 <span
-                  className="ml-auto font-mono text-[9px] px-2 py-0.5 rounded-full shrink-0"
+                  className="ml-auto font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0"
                   style={{
-                    background: (entry.tier === 1 ? '#C9A84C' : '#3A5A8A') + '18',
-                    color:      entry.tier === 1 ? '#C9A84C' : '#8AA8C8',
-                    border:     `1px solid ${entry.tier === 1 ? '#C9A84C' : '#3A5A8A'}35`,
+                    background: (entry.tier === 1 ? '#C9A84C' : '#3A5A8A') + '4D',
+                    color:      '#F5F0E8',
+                    border:     `1px solid ${entry.tier === 1 ? '#C9A84C' : '#3A5A8A'}CC`,
                   }}
                 >
                   {entry.tier === 1 ? 'NARA' : 'Historic Site'}

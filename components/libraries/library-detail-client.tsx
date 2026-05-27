@@ -740,7 +740,7 @@ function NearbySitesSection({ nearby }: { nearby: NearbyLocation[] }) {
                   {site.presidentName && (
                     <p className="font-mono text-xs text-cream/40">{site.presidentName}</p>
                   )}
-                  <p className="font-mono text-xs text-cream/30">{site.city}, {site.state}</p>
+                  <p className="font-mono text-xs" style={{ color: '#8BBBD4' }}>{site.city}, {site.state}</p>
                 </div>
                 <span className="font-mono text-[10px] text-gold/60 shrink-0">
                   {Math.round(site.distanceMiles)} mi
@@ -850,11 +850,11 @@ export default function LibraryDetailClient({
             {/* Era badge */}
             {p?.era && (
               <span
-                className="font-mono text-[10px] px-2.5 py-1 rounded-full mb-3 self-start"
+                className="font-mono text-[12px] font-semibold px-2.5 py-1 rounded-full mb-3 self-start"
                 style={{
-                  backgroundColor: eraColor + '25',
-                  color: eraColor,
-                  border: `1px solid ${eraColor}50`,
+                  backgroundColor: eraColor + '4D',
+                  color: '#F5F0E8',
+                  border: `1px solid ${eraColor}CC`,
                 }}
               >
                 {ERA_LABELS[p.era] ?? p.era}
@@ -866,7 +866,7 @@ export default function LibraryDetailClient({
               {p?.name ?? location.name}
             </h1>
             {p && (
-              <p className="font-mono text-sm text-cream/60 mb-4">
+              <p className="font-mono text-sm mb-4" style={{ color: '#8BBBD4' }}>
                 {ordinal(p.number)} President of the United States
               </p>
             )}

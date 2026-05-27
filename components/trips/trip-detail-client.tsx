@@ -470,10 +470,10 @@ function StopCard({
           <h3 className="text-sm font-mono font-bold text-white truncate leading-tight">
             {loc?.name ?? 'Unknown Location'}
           </h3>
-          <p className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="text-xs font-mono" style={{ color: '#8BBBD4' }}>
             {loc ? `${loc.city}, ${loc.state}` : ''}
             {pres && (
-              <span style={{ color: `${eraColor}99` }}>
+              <span style={{ color: '#8BBBD4' }}>
                 {' '}· {ordinal(pres.number)} President
               </span>
             )}
@@ -604,7 +604,7 @@ function BudgetBreakdown({
 
         {stopRows.length === 0 && (
           <div className="px-5 py-2.5">
-            <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <span className="text-xs font-mono" style={{ color: '#8BBBD4' }}>
               No stop budgets added yet
             </span>
           </div>
@@ -1412,7 +1412,7 @@ export default function TripDetailClient({
                 {statusCfg.label}
               </span>
               {trip.startDate && (
-                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                <span className="text-xs font-mono" style={{ color: '#8BBBD4' }}>
                   {formatDateRange(trip.startDate, trip.endDate)}
                 </span>
               )}
@@ -1561,7 +1561,7 @@ export default function TripDetailClient({
             >
               <div className="flex items-center justify-center mb-1">{icon}</div>
               <div className="text-sm font-mono font-bold text-white">{value}</div>
-              <div className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10 }}>
+              <div className="text-xs font-mono" style={{ color: '#8BBBD4', fontSize: 10 }}>
                 {label}
               </div>
             </div>

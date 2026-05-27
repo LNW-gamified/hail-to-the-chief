@@ -137,11 +137,11 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
             {/* Era + years row */}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span
-                className="font-mono text-[11px] px-2 py-0.5 rounded-full"
+                className="font-mono text-[11px] px-2 py-0.5 rounded-full font-semibold"
                 style={{
-                  backgroundColor: eraColor + '28',
-                  color: eraColor,
-                  border: `1px solid ${eraColor}50`,
+                  backgroundColor: eraColor + '4D',
+                  color: '#F5F0E8',
+                  border: `1px solid ${eraColor}CC`,
                 }}
               >
                 {eraLabel}

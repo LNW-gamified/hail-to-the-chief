@@ -601,7 +601,7 @@ function QuizCard({ entry }: { entry: QuizEntry }) {
         </div>
         <div className="min-w-0">
           <p className="font-display text-sm text-cream truncate">{entry.presidentName}</p>
-          <p className="font-mono text-[10px] text-cream/35">{entry.city}, {entry.state}</p>
+          <p className="font-mono text-[11px]" style={{ color: '#8BBBD4' }}>{entry.city}, {entry.state}</p>
         </div>
       </div>
 

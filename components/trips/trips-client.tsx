@@ -214,19 +214,19 @@ function TripCard({ trip }: { trip: TripEntry }) {
                   const c = ERA_COLORS[s.era ?? ''] ?? ERA_COLORS.modern;
                   return (
                     <div key={i} className="flex items-center gap-1 px-2 py-0.5 rounded-full"
-                      style={{ background: `${c}22`, border: `1px solid ${c}44` }}
+                      style={{ background: `${c}4D`, border: `1px solid ${c}CC` }}
                     >
                       <PortraitImg
                         src={s.portraitUrl}
                         alt=""
                         className="w-4 h-4 rounded-full object-cover object-top"
                         fallback={
-                          <span style={{ fontSize: 10, color: `${c}` }} className="font-mono font-bold">
+                          <span style={{ fontSize: 10, color: '#F5F0E8' }} className="font-mono font-bold">
                             {s.presidentNumber ?? '?'}
                           </span>
                         }
                       />
-                      <span className="font-mono text-white/60 truncate" style={{ fontSize: 10, maxWidth: 90 }}>
+                      <span className="font-mono truncate" style={{ fontSize: 10, maxWidth: 90, color: '#F5F0E8' }}>
                         {s.locationName.replace(' Presidential Library and Museum', '').replace(' Presidential Library', '').replace(' Presidential Museum', '')}
                       </span>
                     </div>
