@@ -37,7 +37,7 @@ type Filter = 'all' | 'nara' | 'sites' | 'visited' | 'not_yet';
 type Sort   = 'chronological' | 'geographical' | 'recently_visited';
 
 const FILTER_LABELS: Record<Filter, string> = {
-  all:      'All Libraries',
+  all:      'All Locations',
   nara:     'NARA (15)',
   sites:    'Historic Sites',
   visited:  'Visited',
@@ -197,7 +197,7 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
 // ── main client component ─────────────────────────────────────────────────────
 
 export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }) {
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>('nara');
   const [sort, setSort]     = useState<Sort>('chronological');
 
   const naraCount    = entries.filter(e => e.tier === 1).length;
