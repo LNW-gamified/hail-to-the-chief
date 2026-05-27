@@ -11,6 +11,7 @@ import {
 import { createClient } from '@/lib/supabase';
 import { ERA_COLORS, ERA_LABELS, ordinal } from '@/lib/era';
 import { PortraitImg } from '@/components/ui/portrait-img';
+import LogVisitModal, { type LogVisitSuccessData } from '@/components/visits/log-visit-modal';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -120,112 +121,6 @@ function Accordion({ title, icon, children, defaultOpen = false }: {
         />
       </button>
       {open && <div className="pb-5 space-y-3">{children}</div>}
-    </div>
-  );
-}
-
-// ── mark visited modal ─────────────────────────────────────────────────────────
-
-function MarkVisitedModal({
-  locationId,
-  onClose,
-  onSuccess,
-}: {
-  locationId: string;
-  onClose: () => void;
-  onSuccess: (visit: VisitData) => void;
-}) {
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError('Not authenticated'); setLoading(false); return; }
-
-    const { data, error: err } = await supabase
-      .from('location_visits')
-      .insert({
-        user_id: user.id,
-        location_id: locationId,
-        visit_date: date,
-        notes: notes || null,
-      })
-      .select('id, visit_date, notes, moments, photos, weather_temp, weather_conditions, weather_wind')
-      .single();
-
-    if (err) { setError(err.message); setLoading(false); return; }
-    try { localStorage.setItem('hailToTheChief.newStamp', locationId); } catch { /* ignore */ }
-    onSuccess({
-      id: data.id,
-      visitDate: data.visit_date,
-      notes: data.notes,
-      moments: data.moments,
-      photos: data.photos,
-      weatherTemp: data.weather_temp,
-      weatherConditions: data.weather_conditions,
-      weatherWind: data.weather_wind,
-    });
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6">
-        <h3 className="font-display text-xl text-cream mb-5">Log Your Visit</h3>
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label className="block font-mono text-xs text-cream/50 mb-1.5 tracking-wide">
-              VISIT DATE
-            </label>
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              className="w-full bg-navy border border-border rounded-lg px-4 py-3 text-cream font-mono text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block font-mono text-xs text-cream/50 mb-1.5 tracking-wide">
-              NOTES (OPTIONAL)
-            </label>
-            <textarea
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              rows={3}
-              className="w-full bg-navy border border-border rounded-lg px-4 py-3 text-cream font-serif text-sm placeholder-cream/20 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors resize-none"
-              placeholder="What stood out? Any personal reflections..."
-            />
-          </div>
-          {error && (
-            <p className="font-mono text-xs text-red bg-red/10 border border-red/20 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
-          <div className="flex gap-3 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 font-mono text-sm text-cream/50 border border-border rounded-xl py-3 hover:border-cream/30 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 font-mono text-sm font-bold bg-gold text-navy rounded-xl py-3 hover:bg-gold/90 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Saving…' : 'Log Visit'}
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 }
@@ -781,8 +676,17 @@ export default function LibraryDetailClient({
   const era = p?.era ?? 'modern';
   const eraColor = ERA_COLORS[era] ?? ERA_COLORS.modern;
 
-  const onVisitLogged = useCallback((v: VisitData) => {
-    setVisits([v, ...visits]);
+  const onVisitLogged = useCallback((data: LogVisitSuccessData) => {
+    setVisits([{
+      id: data.visitId,
+      visitDate: data.visitDate,
+      notes: data.notes,
+      moments: data.moments,
+      photos: data.photos,
+      weatherTemp: data.weatherTemp,
+      weatherConditions: data.weatherConditions,
+      weatherWind: null,
+    }, ...visits]);
     setShowModal(false);
     setActiveTab('visit');
     router.refresh();
@@ -808,8 +712,12 @@ export default function LibraryDetailClient({
   return (
     <>
       {showModal && (
-        <MarkVisitedModal
+        <LogVisitModal
           locationId={location.id}
+          locationName={location.name}
+          latitude={location.latitude}
+          longitude={location.longitude}
+          presidentId={location.president?.id ?? null}
           onClose={() => setShowModal(false)}
           onSuccess={onVisitLogged}
         />

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase-server';
 import { getRank } from '@/lib/ranks';
 import ProgressRing from '@/components/home/progress-ring';
 import XpBar from '@/components/home/xp-bar';
+import HomeLogVisitButton from '@/components/home/log-visit-button';
 
 const TOTAL_NARA = 15;
 
@@ -503,9 +504,12 @@ export default async function HomePage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-display text-xl text-cream">Recent Activity</h3>
-          <Link href="/passport" className="font-mono text-xs text-gold/60 hover:text-gold transition-colors">
-            Full passport →
-          </Link>
+          <div className="flex items-center gap-3">
+            <HomeLogVisitButton />
+            <Link href="/passport" className="font-mono text-xs text-gold/60 hover:text-gold transition-colors">
+              Full passport →
+            </Link>
+          </div>
         </div>
 
         {recent.length > 0 ? (
