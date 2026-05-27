@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { X, MapPin, Check, ExternalLink, Map, ChevronRight } from 'lucide-react';
 import { ERA_COLORS } from '@/lib/era';
+import { PortraitImg } from '@/components/ui/portrait-img';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -169,17 +170,16 @@ function BottomSheet({
                   className="w-16 h-16 rounded-full shrink-0 overflow-hidden flex items-center justify-center border-2"
                   style={{ borderColor: eraColor + '80', background: eraColor + '15' }}
                 >
-                  {entry.portraitUrl ? (
-                    <img
-                      src={entry.portraitUrl}
-                      alt={entry.presidentName ?? ''}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="font-mono text-lg font-bold" style={{ color: eraColor }}>
-                      {initials}
-                    </span>
-                  )}
+                  <PortraitImg
+                    src={entry.portraitUrl}
+                    alt={entry.presidentName ?? ''}
+                    className="w-full h-full object-cover"
+                    fallback={
+                      <span className="font-mono text-lg font-bold" style={{ color: eraColor }}>
+                        {initials}
+                      </span>
+                    }
+                  />
                 </div>
 
                 {/* Info */}

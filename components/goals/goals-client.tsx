@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Lock, Zap, Hand, Trophy, BookOpen, ChevronRight, X, Check } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
 import { ERA_COLORS } from '@/lib/era';
+import { PortraitImg } from '@/components/ui/portrait-img';
 
 // ── exported types ────────────────────────────────────────────────────────────
 
@@ -591,11 +592,12 @@ function QuizCard({ entry }: { entry: QuizEntry }) {
           className="w-12 h-12 rounded-full overflow-hidden shrink-0 flex items-center justify-center border-2"
           style={{ borderColor: eraColor + '50', background: eraColor + '15' }}
         >
-          {entry.portraitUrl ? (
-            <img src={entry.portraitUrl} alt={entry.presidentName} className="w-full h-full object-cover" />
-          ) : (
-            <span className="font-mono text-sm font-bold" style={{ color: eraColor }}>{initials}</span>
-          )}
+          <PortraitImg
+            src={entry.portraitUrl}
+            alt={entry.presidentName}
+            className="w-full h-full object-cover"
+            fallback={<span className="font-mono text-sm font-bold" style={{ color: eraColor }}>{initials}</span>}
+          />
         </div>
         <div className="min-w-0">
           <p className="font-display text-sm text-cream truncate">{entry.presidentName}</p>
@@ -795,16 +797,21 @@ export default function GoalsClient({
         >
           <div className="flex flex-col md:flex-row items-center gap-6 p-6 md:p-8">
             {/* Shield */}
-            <div className="w-28 h-28 md:w-36 md:h-36 shrink-0">
+            <div
+              className="w-36 h-36 md:w-44 md:h-44 shrink-0"
+              style={{ filter: 'drop-shadow(0 0 16px rgba(201,168,76,0.45)) drop-shadow(0 0 32px rgba(201,168,76,0.2))' }}
+            >
               <RankShield level={rankInfo.level} />
             </div>
 
             {/* Rank info */}
             <div className="flex-1 min-w-0 text-center md:text-left">
-              <p className="font-mono text-[11px] tracking-[0.3em] text-gold/40 mb-1">
-                CURRENT RANK
-              </p>
-              <h2 className="font-display text-3xl md:text-4xl text-cream">{rankInfo.title}</h2>
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                <span className="text-gold text-sm">★</span>
+                <p className="font-mono text-[11px] tracking-[0.3em] text-gold/50">CURRENT RANK</p>
+                <span className="text-gold text-sm">★</span>
+              </div>
+              <h2 className="font-display text-3xl md:text-4xl text-gold">{rankInfo.title}</h2>
 
               {rankInfo.nextTitle && (
                 <p className="font-mono text-xs text-cream/35 mt-1">

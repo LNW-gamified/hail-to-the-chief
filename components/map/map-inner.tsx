@@ -11,9 +11,9 @@ import type { MapEntry } from './trail-map';
 // ── constants ─────────────────────────────────────────────────────────────────
 
 const TILE_URL =
-  'https://{s}.basemaps.cartocdn.com/dark_matter_all/{z}/{x}/{y}{r}.png';
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 // continental US default view
 const CONTINENTAL_CENTER: [number, number] = [39.5, -98.35];
@@ -22,17 +22,17 @@ const CONTINENTAL_ZOOM = 4;
 // ── custom marker factories ───────────────────────────────────────────────────
 
 function naraIcon(number: number | null, visited: boolean): L.DivIcon {
-  const size = 36;
+  const size = 40;
   const bg      = visited ? '#C9A84C' : '#0F1E30';
   const fg      = visited ? '#0A1628' : '#C9A84C';
-  const border  = visited ? '#F0D060' : 'rgba(201,168,76,0.45)';
+  const border  = visited ? '#F0D060' : '#C9A84C';
   const glow    = visited
-    ? 'box-shadow:0 0 0 5px rgba(201,168,76,0.22),0 3px 10px rgba(0,0,0,0.6);'
-    : 'box-shadow:0 2px 8px rgba(0,0,0,0.6);';
+    ? 'box-shadow:0 0 12px #C9A84C,0 0 0 3px rgba(201,168,76,0.3),0 3px 10px rgba(0,0,0,0.7);'
+    : 'box-shadow:0 0 0 2px rgba(201,168,76,0.15),0 2px 8px rgba(0,0,0,0.6);';
   const badge = visited
-    ? `<span style="position:absolute;top:-5px;right:-5px;width:15px;height:15px;
+    ? `<span style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;
         background:#0A1628;border:1.5px solid #C9A84C;border-radius:50%;
-        font-size:9px;line-height:15px;text-align:center;color:#C9A84C;">✓</span>`
+        font-size:10px;line-height:16px;text-align:center;color:#C9A84C;">✓</span>`
     : '';
 
   return L.divIcon({
@@ -40,7 +40,7 @@ function naraIcon(number: number | null, visited: boolean): L.DivIcon {
         width:${size}px;height:${size}px;border-radius:50%;
         background:${bg};border:2.5px solid ${border};${glow}
         display:flex;align-items:center;justify-content:center;
-        font-family:'Courier New',monospace;font-size:11px;font-weight:700;
+        font-family:'Courier New',monospace;font-size:14px;font-weight:700;
         color:${fg};position:relative;cursor:pointer;
       ">${number ?? '?'}${badge}</div>`,
     iconSize:    [size, size],
@@ -51,12 +51,12 @@ function naraIcon(number: number | null, visited: boolean): L.DivIcon {
 }
 
 function historicIcon(visited: boolean): L.DivIcon {
-  const size   = 24;
+  const size   = 28;
   const bg     = visited ? '#C9A84C' : '#1A2A3A';
-  const fg     = visited ? '#0A1628' : '#8A9EAE';
-  const border = visited ? '#F0D060' : 'rgba(138,158,174,0.5)';
+  const fg     = visited ? '#0A1628' : '#8AA0B8';
+  const border = visited ? '#F0D060' : '#8AA0B8';
   const glow   = visited
-    ? 'box-shadow:0 0 0 3px rgba(201,168,76,0.2),0 2px 6px rgba(0,0,0,0.5);'
+    ? 'box-shadow:0 0 8px rgba(201,168,76,0.6),0 0 0 2px rgba(201,168,76,0.2),0 2px 6px rgba(0,0,0,0.5);'
     : 'box-shadow:0 2px 6px rgba(0,0,0,0.4);';
 
   return L.divIcon({
@@ -64,7 +64,7 @@ function historicIcon(visited: boolean): L.DivIcon {
         width:${size}px;height:${size}px;border-radius:50%;
         background:${bg};border:2px solid ${border};${glow}
         display:flex;align-items:center;justify-content:center;
-        font-size:10px;color:${fg};cursor:pointer;
+        font-size:12px;color:${fg};cursor:pointer;
       ">★</div>`,
     iconSize:    [size, size],
     iconAnchor:  [size / 2, size / 2],
@@ -212,6 +212,7 @@ export default function MapInner({
         center={CONTINENTAL_CENTER}
         zoom={CONTINENTAL_ZOOM}
         className="h-full w-full"
+        style={{ height: '100%', width: '100%' }}
         zoomControl={true}
         attributionControl={true}
       >

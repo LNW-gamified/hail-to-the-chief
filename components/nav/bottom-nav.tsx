@@ -37,7 +37,7 @@ export default function BottomNav() {
             )}
           >
             <Icon size={20} strokeWidth={active ? 2 : 1.5} />
-            <span className="font-mono text-[10px] tracking-wide">{label}</span>
+            <span className="font-mono text-[11px] tracking-wide">{label}</span>
           </Link>
         );
       })}

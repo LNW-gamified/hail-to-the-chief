@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 import { ERA_COLORS } from '@/lib/era';
+import { PortraitImg } from '@/components/ui/portrait-img';
 import {
   Plus, Map, Calendar, Clock, ChevronRight,
   Route, X, Search, Check,
@@ -143,20 +144,19 @@ function TripCard({ trip }: { trip: TripEntry }) {
           <div className="absolute inset-0"
             style={{ background: `linear-gradient(to bottom, transparent 50%, #0a1628 100%)` }}
           />
-          {first?.portraitUrl ? (
-            <img
-              src={first.portraitUrl}
-              alt={first.presidentName ?? ''}
-              className="absolute right-0 bottom-0 h-40 object-contain object-bottom"
-              style={{ filter: 'drop-shadow(-4px 0 16px rgba(0,0,0,0.8))' }}
-            />
-          ) : (
-            <div className="absolute right-5 bottom-5 w-20 h-24 rounded-lg flex items-center justify-center opacity-30"
-              style={{ background: `${eraColor}33`, border: `1px solid ${eraColor}44` }}
-            >
-              <span style={{ fontSize: 36 }}>🏛️</span>
-            </div>
-          )}
+          <PortraitImg
+            src={first?.portraitUrl}
+            alt={first?.presidentName ?? ''}
+            className="absolute right-0 bottom-0 h-40 object-contain object-bottom"
+            style={{ filter: 'drop-shadow(-4px 0 16px rgba(0,0,0,0.8))' }}
+            fallback={
+              <div className="absolute right-5 bottom-5 w-20 h-24 rounded-lg flex items-center justify-center opacity-30"
+                style={{ background: `${eraColor}33`, border: `1px solid ${eraColor}44` }}
+              >
+                <span style={{ fontSize: 36 }}>🏛️</span>
+              </div>
+            }
+          />
 
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold"
@@ -216,13 +216,16 @@ function TripCard({ trip }: { trip: TripEntry }) {
                     <div key={i} className="flex items-center gap-1 px-2 py-0.5 rounded-full"
                       style={{ background: `${c}22`, border: `1px solid ${c}44` }}
                     >
-                      {s.portraitUrl ? (
-                        <img src={s.portraitUrl} alt="" className="w-4 h-4 rounded-full object-cover object-top" />
-                      ) : (
-                        <span style={{ fontSize: 10, color: `${c}` }} className="font-mono font-bold">
-                          {s.presidentNumber ?? '?'}
-                        </span>
-                      )}
+                      <PortraitImg
+                        src={s.portraitUrl}
+                        alt=""
+                        className="w-4 h-4 rounded-full object-cover object-top"
+                        fallback={
+                          <span style={{ fontSize: 10, color: `${c}` }} className="font-mono font-bold">
+                            {s.presidentNumber ?? '?'}
+                          </span>
+                        }
+                      />
                       <span className="font-mono text-white/60 truncate" style={{ fontSize: 10, maxWidth: 90 }}>
                         {s.locationName.replace(' Presidential Library and Museum', '').replace(' Presidential Library', '').replace(' Presidential Museum', '')}
                       </span>
@@ -487,9 +490,7 @@ function PlanTripModal({
                     <span className="text-xs font-mono font-bold w-4 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.6)' }}>
                       {i + 1}.
                     </span>
-                    {s.portraitUrl && (
-                      <img src={s.portraitUrl} alt="" className="w-6 h-6 rounded-full object-cover object-top flex-shrink-0" />
-                    )}
+                    <PortraitImg src={s.portraitUrl} alt="" className="w-6 h-6 rounded-full object-cover object-top flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-mono text-white truncate">{s.name}</div>
                       <div className="font-mono" style={{ fontSize: 10, color: 'rgba(201,168,76,0.6)' }}>
@@ -542,17 +543,20 @@ function PlanTripModal({
                       onMouseDown={() => addStop(loc)}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left"
                     >
-                      {loc.portraitUrl ? (
-                        <img src={loc.portraitUrl} alt="" className="w-7 h-7 rounded-full object-cover object-top flex-shrink-0" />
-                      ) : (
-                        <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center"
-                          style={{ background: 'rgba(201,168,76,0.15)' }}
-                        >
-                          <span className="text-xs font-mono font-bold" style={{ color: '#C9A84C' }}>
-                            {loc.presidentNumber ?? '?'}
-                          </span>
-                        </div>
-                      )}
+                      <PortraitImg
+                        src={loc.portraitUrl}
+                        alt=""
+                        className="w-7 h-7 rounded-full object-cover object-top flex-shrink-0"
+                        fallback={
+                          <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center"
+                            style={{ background: 'rgba(201,168,76,0.15)' }}
+                          >
+                            <span className="text-xs font-mono font-bold" style={{ color: '#C9A84C' }}>
+                              {loc.presidentNumber ?? '?'}
+                            </span>
+                          </div>
+                        }
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-mono text-white truncate">{loc.name}</div>
                         <div className="font-mono" style={{ fontSize: 10, color: 'rgba(201,168,76,0.55)' }}>

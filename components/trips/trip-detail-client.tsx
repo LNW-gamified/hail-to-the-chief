@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 import { ERA_COLORS, ordinal } from '@/lib/era';
+import { PortraitImg } from '@/components/ui/portrait-img';
 import type { LocationOption } from './trips-client';
 import {
   ChevronDown, X, Search, ExternalLink, Pencil, Trash2,
@@ -448,23 +449,22 @@ function StopCard({
           {index + 1}
         </span>
 
-        {pres?.portraitUrl ? (
-          <img
-            src={pres.portraitUrl}
-            alt={pres.name}
-            className="w-10 h-10 rounded-full object-cover object-top flex-shrink-0"
-            style={{ border: `1.5px solid ${eraColor}55` }}
-          />
-        ) : (
-          <div
-            className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
-            style={{ background: `${eraColor}22`, border: `1.5px solid ${eraColor}44` }}
-          >
-            <span className="text-sm font-mono font-bold" style={{ color: eraColor }}>
-              {pres?.number ?? '?'}
-            </span>
-          </div>
-        )}
+        <PortraitImg
+          src={pres?.portraitUrl}
+          alt={pres?.name ?? ''}
+          className="w-10 h-10 rounded-full object-cover object-top flex-shrink-0"
+          style={{ border: `1.5px solid ${eraColor}55` }}
+          fallback={
+            <div
+              className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
+              style={{ background: `${eraColor}22`, border: `1.5px solid ${eraColor}44` }}
+            >
+              <span className="text-sm font-mono font-bold" style={{ color: eraColor }}>
+                {pres?.number ?? '?'}
+              </span>
+            </div>
+          }
+        />
 
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-mono font-bold text-white truncate leading-tight">
@@ -1130,9 +1130,7 @@ function AddStopModal({
               <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg"
                 style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.3)' }}
               >
-                {selected.portraitUrl && (
-                  <img src={selected.portraitUrl} alt="" className="w-8 h-8 rounded-full object-cover object-top" />
-                )}
+                <PortraitImg src={selected.portraitUrl} alt="" className="w-8 h-8 rounded-full object-cover object-top" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-mono text-white truncate">{selected.name}</div>
                   <div className="text-xs font-mono" style={{ color: 'rgba(201,168,76,0.6)' }}>
@@ -1168,17 +1166,20 @@ function AddStopModal({
                     <button key={loc.id} onClick={() => setSelected(loc)}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left"
                     >
-                      {loc.portraitUrl ? (
-                        <img src={loc.portraitUrl} alt="" className="w-7 h-7 rounded-full object-cover object-top flex-shrink-0" />
-                      ) : (
-                        <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center"
-                          style={{ background: 'rgba(201,168,76,0.15)' }}
-                        >
-                          <span className="text-xs font-mono font-bold" style={{ color: '#C9A84C' }}>
-                            {loc.presidentNumber ?? '?'}
-                          </span>
-                        </div>
-                      )}
+                      <PortraitImg
+                        src={loc.portraitUrl}
+                        alt=""
+                        className="w-7 h-7 rounded-full object-cover object-top flex-shrink-0"
+                        fallback={
+                          <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center"
+                            style={{ background: 'rgba(201,168,76,0.15)' }}
+                          >
+                            <span className="text-xs font-mono font-bold" style={{ color: '#C9A84C' }}>
+                              {loc.presidentNumber ?? '?'}
+                            </span>
+                          </div>
+                        }
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-mono text-white truncate">{loc.name}</div>
                         <div className="font-mono" style={{ fontSize: 10, color: 'rgba(201,168,76,0.55)' }}>
@@ -1385,14 +1386,12 @@ export default function TripDetailClient({
             style={{ background: 'linear-gradient(to bottom, transparent 40%, #040e1c 100%)' }}
           />
 
-          {heroStop?.location?.president?.portraitUrl && (
-            <img
-              src={heroStop.location.president.portraitUrl}
-              alt={heroStop.location.president.name}
-              className="absolute right-0 bottom-0 h-64 object-contain object-bottom pointer-events-none"
-              style={{ filter: `drop-shadow(-8px 0 24px rgba(0,0,0,0.8))` }}
-            />
-          )}
+          <PortraitImg
+            src={heroStop?.location?.president?.portraitUrl}
+            alt={heroStop?.location?.president?.name ?? ''}
+            className="absolute right-0 bottom-0 h-64 object-contain object-bottom pointer-events-none"
+            style={{ filter: `drop-shadow(-8px 0 24px rgba(0,0,0,0.8))` }}
+          />
 
           {/* Back */}
           <Link

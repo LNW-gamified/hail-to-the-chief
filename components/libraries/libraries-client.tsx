@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Trophy, Building2 } from 'lucide-react';
 import { ERA_COLORS, ERA_LABELS, ordinal } from '@/lib/era';
+import { PortraitImg } from '@/components/ui/portrait-img';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -84,23 +85,26 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
       >
         {/* Era left accent */}
         <div
-          className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl"
+          className="absolute left-0 top-0 bottom-0 w-[4px] rounded-l-xl"
           style={{ backgroundColor: eraColor }}
         />
 
-        <div className="flex items-start gap-4 pl-5 pr-4 py-4">
+        <div className="flex items-start gap-4 pl-5 pr-4 py-5">
           {/* Portrait */}
           <div
             className="w-14 h-14 rounded-full shrink-0 overflow-hidden flex items-center justify-center bg-navy-secondary border-2"
             style={{ borderColor: visited ? eraColor + '80' : '#1E3A5F' }}
           >
-            {p?.portraitUrl ? (
-              <img src={p.portraitUrl} alt={p.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="font-mono text-sm font-bold" style={{ color: eraColor }}>
-                {initials}
-              </span>
-            )}
+            <PortraitImg
+              src={p?.portraitUrl}
+              alt={p?.name ?? ''}
+              className="w-full h-full object-cover"
+              fallback={
+                <span className="font-mono text-sm font-bold" style={{ color: eraColor }}>
+                  {initials}
+                </span>
+              }
+            />
           </div>
 
           {/* Main content */}
@@ -108,11 +112,11 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
             {/* Name row */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="font-display text-base text-cream leading-tight truncate">
+                <h3 className="font-display text-lg font-bold text-cream leading-tight truncate">
                   {p?.name ?? 'Unknown President'}
                 </h3>
                 {p && (
-                  <p className="font-mono text-[10px] text-cream/35 mt-0.5">
+                  <p className="font-mono text-[11px] mt-1" style={{ color: '#A0AEC0' }}>
                     {ordinal(p.number)} President of the United States
                   </p>
                 )}
@@ -120,30 +124,30 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
 
               {/* Historian ranking pill */}
               {p?.historianRanking && (
-                <span className="font-mono text-[10px] text-gold bg-gold/10 border border-gold/20 rounded-full px-2 py-0.5 shrink-0 whitespace-nowrap">
+                <span className="font-mono text-[11px] text-gold bg-gold/10 border border-gold/20 rounded-full px-2 py-0.5 shrink-0 whitespace-nowrap">
                   #{p.historianRanking}
                 </span>
               )}
             </div>
 
             {/* Library name */}
-            <p className="font-serif text-sm text-cream/80 mt-1.5 truncate">{entry.name}</p>
-            <p className="font-mono text-[11px] text-cream/35">{entry.city}, {entry.state}</p>
+            <p className="font-serif text-sm mt-2 truncate" style={{ color: '#D4CFC7' }}>{entry.name}</p>
+            <p className="font-mono text-[13px] mt-1" style={{ color: '#8BA4BC' }}>{entry.city}, {entry.state}</p>
 
             {/* Era + years row */}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span
-                className="font-mono text-[10px] px-2 py-0.5 rounded-full"
+                className="font-mono text-[11px] px-2 py-0.5 rounded-full"
                 style={{
-                  backgroundColor: eraColor + '22',
+                  backgroundColor: eraColor + '28',
                   color: eraColor,
-                  border: `1px solid ${eraColor}40`,
+                  border: `1px solid ${eraColor}50`,
                 }}
               >
                 {eraLabel}
               </span>
               {p && (
-                <span className="font-mono text-[10px] text-cream/30">
+                <span className="font-mono text-[11px]" style={{ color: '#8BA4BC' }}>
                   {p.termStart}–{p.termEnd ?? 'present'}
                 </span>
               )}
@@ -151,14 +155,14 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
 
             {/* Tagline */}
             {p?.tagline && (
-              <p className="font-serif text-xs text-cream/45 italic mt-1.5 truncate">
+              <p className="font-serif text-sm italic mt-2 truncate" style={{ color: '#C9A84C' }}>
                 &ldquo;{p.tagline}&rdquo;
               </p>
             )}
 
             {/* Visit date */}
             {visitLabel && (
-              <p className="font-mono text-[11px] text-gold/60 mt-1.5">
+              <p className="font-mono text-[11px] text-gold mt-2">
                 Visited {visitLabel}
               </p>
             )}
@@ -169,23 +173,23 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
         {visited ? (
           <div className="absolute bottom-3 right-3 pointer-events-none select-none">
             <div
-              className="px-2 py-0.5 rounded border-2"
+              className="flex items-center justify-center rounded border-2"
               style={{
-                borderColor: eraColor + '70',
-                transform: 'rotate(-8deg)',
+                background: '#CC0000',
+                borderColor: '#FF2020',
+                transform: 'rotate(-12deg)',
+                minWidth: '72px',
+                padding: '3px 10px',
               }}
             >
-              <span
-                className="font-mono text-[9px] font-bold tracking-[0.2em]"
-                style={{ color: eraColor + 'AA' }}
-              >
+              <span className="font-mono text-[14px] font-bold tracking-[0.15em] text-white">
                 VISITED
               </span>
             </div>
           </div>
         ) : (
           <div className="absolute top-3 right-3 pointer-events-none">
-            <span className="font-mono text-[10px] text-cream/20 bg-border/30 rounded-full px-2 py-0.5">
+            <span className="font-mono text-[11px]" style={{ color: '#8BA4BC' }}>
               Not Yet
             </span>
           </div>
@@ -245,7 +249,7 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
   const singleSection = !showSplit;
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-4xl mx-auto">
+    <div className="px-5 py-6 md:px-8 md:py-8 space-y-6 max-w-4xl mx-auto">
 
       {/* ── page header ── */}
       <div>
@@ -315,7 +319,7 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
 
       {/* ── single-section (Visited / Not Yet tabs) ── */}
       {singleSection && sorted.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {sorted.map(e => <LibraryCard key={e.id} entry={e} />)}
         </div>
       )}
@@ -331,7 +335,7 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
                   Visited ({visitedItems.length})
                 </h2>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {visitedItems.map(e => <LibraryCard key={e.id} entry={e} />)}
               </div>
             </section>
@@ -344,7 +348,7 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
                   Not Yet ({notYetItems.length})
                 </h2>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {notYetItems.map(e => <LibraryCard key={e.id} entry={e} />)}
               </div>
             </section>

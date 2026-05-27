@@ -202,7 +202,7 @@ export default async function HomePage() {
 
   // ── render ────────────────────────────────────────────────────────────────
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-6xl mx-auto">
+    <div className="px-5 py-6 md:px-8 md:py-8 space-y-8 max-w-6xl mx-auto">
 
       {/* ── page title ── */}
       <h1 className="font-display text-3xl text-cream">The Situation Room</h1>
@@ -229,23 +229,30 @@ export default async function HomePage() {
 
         {/* rank card */}
         <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-5">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center text-gold shrink-0">
-              <Shield size={22} />
+          <div className="flex items-center gap-5">
+            <div
+              className="w-20 h-20 rounded-full bg-gold/10 border-2 border-gold/50 flex items-center justify-center text-gold shrink-0"
+              style={{ boxShadow: '0 0 24px rgba(201,168,76,0.3), 0 0 48px rgba(201,168,76,0.12)' }}
+            >
+              <Shield size={40} />
             </div>
             <div>
-              <p className="font-mono text-[11px] text-cream/40 tracking-widest">YOUR RANK</p>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-gold/70 text-xs">★</span>
+                <p className="font-mono text-[11px] text-cream/40 tracking-widest">YOUR RANK</p>
+                <span className="text-gold/70 text-xs">★</span>
+              </div>
               <p className="font-display text-2xl text-gold">{rank.title}</p>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between items-baseline">
-              <span className="font-mono text-sm text-cream/60">
+              <span className="font-mono text-sm" style={{ color: '#A0AEC0' }}>
                 {totalXp.toLocaleString()} XP earned
               </span>
               {rank.nextRank && (
-                <span className="font-mono text-xs text-cream/40">
+                <span className="font-mono text-xs" style={{ color: '#8BA4BC' }}>
                   {(rank.nextRank.minXp - totalXp).toLocaleString()} to next
                 </span>
               )}
@@ -284,11 +291,11 @@ export default async function HomePage() {
                 <p className="font-display text-lg text-cream leading-tight truncate">
                   {upNext.locationName}
                 </p>
-                <p className="font-serif text-sm text-cream/50 mt-0.5">
+                <p className="font-serif text-sm mt-0.5" style={{ color: '#A0AEC0' }}>
                   {upNext.locationCity}, {upNext.locationState}
                 </p>
                 {upNext.presidentName && (
-                  <p className="font-mono text-xs text-cream/40 mt-1">
+                  <p className="font-mono text-xs mt-1" style={{ color: '#A0AEC0' }}>
                     {upNext.presidentName}
                   </p>
                 )}
@@ -363,7 +370,7 @@ export default async function HomePage() {
         <p className="font-mono text-[11px] text-cream/30 tracking-[0.25em] mb-4">
           STATE OF THE UNION
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {[
             { label: 'Libraries Visited',  value: librariesVisited, icon: Building2,  color: 'text-gold'       },
             { label: 'Historic Sites',     value: historicVisited,  icon: Landmark,   color: 'text-cream/70'   },
@@ -376,7 +383,7 @@ export default async function HomePage() {
               <p className={`font-mono text-2xl font-bold ${color}`}>
                 {value.toLocaleString()}
               </p>
-              <p className="font-serif text-xs text-cream/40 leading-tight">{label}</p>
+              <p className="font-serif text-xs leading-tight" style={{ color: '#A0AEC0' }}>{label}</p>
             </div>
           ))}
         </div>
