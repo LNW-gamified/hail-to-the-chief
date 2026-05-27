@@ -83,46 +83,44 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
         ].join(' ')}
         style={visited ? { boxShadow: '0 0 18px rgba(201,168,76,0.10)' } : undefined}
       >
-        {/* Era left accent */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-[4px] rounded-l-xl"
-          style={{ backgroundColor: eraColor }}
-        />
+        <div className="flex" style={{ minHeight: 120 }}>
 
-        <div className="flex items-start gap-4 pl-5 pr-4 py-5">
-          {/* Portrait */}
+          {/* Portrait rectangle — full card height, left side */}
           <div
-            className="w-14 h-14 rounded-full shrink-0 overflow-hidden flex items-center justify-center bg-navy-secondary border-2"
-            style={{ borderColor: visited ? eraColor + '80' : '#1E3A5F' }}
+            className="relative shrink-0 overflow-hidden"
+            style={{ width: 80, borderRight: '2px solid #C9A84C' }}
           >
             <PortraitImg
               src={p?.portraitUrl}
               alt={p?.name ?? ''}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-top"
               fallback={
-                <span className="font-mono text-sm font-bold" style={{ color: eraColor }}>
-                  {initials}
-                </span>
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ background: '#0A1628' }}
+                >
+                  <span className="font-mono text-xl font-bold" style={{ color: eraColor }}>
+                    {initials}
+                  </span>
+                </div>
               }
             />
           </div>
 
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
+          {/* Card content */}
+          <div className="flex-1 min-w-0 pl-4 pr-3 py-4">
             {/* Name row */}
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <h3 className="font-display text-lg font-bold text-cream leading-tight truncate">
                   {p?.name ?? 'Unknown President'}
                 </h3>
                 {p && (
-                  <p className="font-mono text-[11px] mt-1" style={{ color: '#A0AEC0' }}>
+                  <p className="font-mono text-[11px] mt-0.5" style={{ color: '#A0AEC0' }}>
                     {ordinal(p.number)} President of the United States
                   </p>
                 )}
               </div>
-
-              {/* Historian ranking pill */}
               {p?.historianRanking && (
                 <span className="font-mono text-[11px] text-gold bg-gold/10 border border-gold/20 rounded-full px-2 py-0.5 shrink-0 whitespace-nowrap">
                   #{p.historianRanking}
@@ -130,11 +128,9 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
               )}
             </div>
 
-            {/* Library name */}
             <p className="font-serif text-sm mt-2 truncate" style={{ color: '#D4CFC7' }}>{entry.name}</p>
-            <p className="font-mono text-[13px] mt-1" style={{ color: '#8BA4BC' }}>{entry.city}, {entry.state}</p>
+            <p className="font-mono text-[13px] mt-0.5" style={{ color: '#8BA4BC' }}>{entry.city}, {entry.state}</p>
 
-            {/* Era + years row */}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span
                 className="font-mono text-[11px] px-2 py-0.5 rounded-full font-semibold"
@@ -153,14 +149,12 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
               )}
             </div>
 
-            {/* Tagline */}
             {p?.tagline && (
               <p className="font-serif text-sm italic mt-2 truncate" style={{ color: '#C9A84C' }}>
                 &ldquo;{p.tagline}&rdquo;
               </p>
             )}
 
-            {/* Visit date */}
             {visitLabel && (
               <p className="font-mono text-[11px] text-gold mt-2">
                 Visited {visitLabel}
