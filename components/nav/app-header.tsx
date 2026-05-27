@@ -29,7 +29,10 @@ export default function AppHeader({ displayName }: Props) {
       <h1 className="hidden md:block font-display text-xl text-cream">{pageTitle}</h1>
 
       {/* Mobile: logo */}
-      <span className="md:hidden font-display text-lg text-gold">Hail to the Chief</span>
+      <div className="md:hidden flex items-center gap-2">
+        <img src="/presidential-seal.svg" alt="" className="w-7 h-7 opacity-90" />
+        <span className="font-display text-lg text-gold">Hail to the Chief</span>
+      </div>
 
       {/* Avatar — both breakpoints */}
       <div className="flex items-center gap-2">

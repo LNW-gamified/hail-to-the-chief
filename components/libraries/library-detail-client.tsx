@@ -840,6 +840,12 @@ export default function LibraryDetailClient({
               className="absolute inset-0"
               style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A1628 100%)' }}
             />
+            {/* presidential seal watermark */}
+            <img
+              src="/presidential-seal.svg"
+              alt=""
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 opacity-[0.06] pointer-events-none select-none"
+            />
             {/* era accent line */}
             <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: eraColor }} />
           </div>

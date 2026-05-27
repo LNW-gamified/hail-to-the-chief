@@ -209,9 +209,9 @@ export default async function HomePage() {
 
       {/* ── daily briefing header ── */}
       <section className="relative overflow-hidden rounded-2xl bg-card border border-border px-8 py-10">
-        {/* watermark */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-          <span className="font-display text-[180px] leading-none text-cream opacity-[0.025]">★</span>
+        {/* presidential seal watermark */}
+        <div className="absolute inset-0 flex items-center justify-end pr-6 pointer-events-none select-none">
+          <img src="/presidential-seal.svg" alt="" className="w-40 h-40 opacity-[0.07]" />
         </div>
         <div className="relative">
           <p className="font-mono text-[11px] text-gold/60 tracking-[0.25em] mb-3">
