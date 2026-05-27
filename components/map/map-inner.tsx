@@ -119,60 +119,6 @@ function TrailLine({ coords }: { coords: [number, number][] }) {
   );
 }
 
-// ── inset map (AK / HI) ────────────────────────────────────────────────────────
-
-function InsetMap({
-  center,
-  zoom,
-  label,
-  entries,
-  onMarkerClick,
-  style,
-}: {
-  center: [number, number];
-  zoom: number;
-  label: string;
-  entries: MapEntry[];
-  onMarkerClick: (e: MapEntry) => void;
-  style: React.CSSProperties;
-}) {
-  return (
-    <div
-      className="absolute z-[900] rounded-lg overflow-hidden border"
-      style={{ borderColor: 'rgba(201,168,76,0.25)', ...style }}
-    >
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        className="h-full w-full"
-        zoomControl={false}
-        attributionControl={false}
-        dragging={false}
-        scrollWheelZoom={false}
-        doubleClickZoom={false}
-        keyboard={false}
-      >
-        <TileLayer url={TILE_URL} />
-        <MapReady />
-        {entries.map(e => (
-          <Marker
-            key={e.locationId}
-            position={[e.latitude!, e.longitude!]}
-            icon={e.tier === 1 ? naraIcon(e.presidentNumber, !!e.visitDate) : historicIcon(!!e.visitDate)}
-            eventHandlers={{ click: () => onMarkerClick(e) }}
-          />
-        ))}
-      </MapContainer>
-      <span
-        className="absolute bottom-1 right-1.5 font-mono z-[1000] pointer-events-none"
-        style={{ fontSize: 9, color: 'rgba(201,168,76,0.5)' }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
 // ── main map component ────────────────────────────────────────────────────────
 
 export type MapInnerProps = {
@@ -188,10 +134,7 @@ export default function MapInner({
   showTrail,
   onMarkerClick,
 }: MapInnerProps) {
-  const valid = entries.filter(e => e.latitude != null && e.longitude != null);
-  const akEntries = valid.filter(e => e.state === 'AK');
-  const hiEntries = valid.filter(e => e.state === 'HI');
-  const mainEntries = valid.filter(e => e.state !== 'AK' && e.state !== 'HI');
+  const mainEntries = entries.filter(e => e.latitude != null && e.longitude != null);
 
   return (
     <>
@@ -236,25 +179,6 @@ export default function MapInner({
         ))}
       </MapContainer>
 
-      {/* Alaska inset */}
-      <InsetMap
-        center={[64, -153]}
-        zoom={3}
-        label="AK"
-        entries={akEntries}
-        onMarkerClick={onMarkerClick}
-        style={{ bottom: 96, left: 8, width: 140, height: 96 }}
-      />
-
-      {/* Hawaii inset */}
-      <InsetMap
-        center={[20.8, -157]}
-        zoom={6}
-        label="HI"
-        entries={hiEntries}
-        onMarkerClick={onMarkerClick}
-        style={{ bottom: 96, left: 156, width: 108, height: 96 }}
-      />
     </>
   );
 }
