@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -34,18 +35,6 @@ function daysAway(dateStr: string): number {
   return Math.round((visit.getTime() - today.getTime()) / 86400000);
 }
 
-function EagleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-      <path d="M10 8.5C8 6.5 4.5 5.5 1.5 6.5C3.5 7.5 5.5 8.5 7 10.5L10 8.5Z" />
-      <path d="M10 8.5C12 6.5 15.5 5.5 18.5 6.5C16.5 7.5 14.5 8.5 13 10.5L10 8.5Z" />
-      <ellipse cx="10" cy="12" rx="3" ry="3.5" />
-      <circle cx="10" cy="5.5" r="2.3" />
-      <path d="M12.5 5.5L14 6.5L12.5 7Z" />
-      <path d="M8 15.5L10 14L12 15.5L11 18H9L8 15.5Z" />
-    </svg>
-  );
-}
 
 export default function Sidebar({ displayName, totalXp, upNext, visitedCount }: Props) {
   const pathname = usePathname();
@@ -58,8 +47,14 @@ export default function Sidebar({ displayName, totalXp, upNext, visitedCount }: 
     <aside className="hidden md:flex flex-col w-[280px] shrink-0 bg-navy border-r border-border h-screen">
 
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-6 pt-6 pb-5">
-        <span className="text-gold"><EagleIcon /></span>
+      <div className="flex flex-col items-center px-6 pt-6 pb-5 gap-2">
+        <Image
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Seal_of_the_President_of_the_United_States.svg/240px-Seal_of_the_President_of_the_United_States.svg.png"
+          alt="Presidential Seal"
+          width={48}
+          height={48}
+          priority
+        />
         <span className="font-display text-xl text-gold leading-tight">
           Hail to the Chief
         </span>

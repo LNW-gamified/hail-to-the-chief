@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { User } from 'lucide-react';
 
@@ -30,7 +31,13 @@ export default function AppHeader({ displayName }: Props) {
 
       {/* Mobile: logo */}
       <div className="md:hidden flex items-center gap-2">
-        <img src="/presidential-seal.svg" alt="" className="w-7 h-7 opacity-90" />
+        <Image
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Seal_of_the_President_of_the_United_States.svg/240px-Seal_of_the_President_of_the_United_States.svg.png"
+          alt="Presidential Seal"
+          width={32}
+          height={32}
+          priority
+        />
         <span className="font-display text-lg text-gold">Hail to the Chief</span>
       </div>
 

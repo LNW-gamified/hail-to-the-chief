@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   title: "Hail to the Chief",
   description: "Visit Every Presidential Library. Leave Your Mark on History.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/presidential-seal.svg",
   },
 };
 
