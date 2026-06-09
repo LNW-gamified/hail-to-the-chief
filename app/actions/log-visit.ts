@@ -251,7 +251,12 @@ async function checkAndAward(
   const hasWest = [...visitedStates].some(s => westCoast.has(s));
 
   const newEarned: EarnedAchievement[] = [];
-  let xpToAdd = 25; // base XP for every logged visit
+
+  // Base XP varies by location tier (use any visit record for this location to look up its tier)
+  const anyVisitForLocation = allVisits.find(v => v.location_id === input.locationId);
+  const visitedLoc = one(anyVisitForLocation?.presidential_locations as never) as { tier: number } | null;
+  const visitTier = visitedLoc?.tier ?? 1;
+  let xpToAdd = visitTier === 1 ? 50 : visitTier === 2 ? 25 : 15;
 
   // Evaluate auto_visit and manual_once achievements
   for (const ach of achievements as Array<{
@@ -343,16 +348,15 @@ async function checkAndAward(
     }
   }
 
-  // Update total XP
+  // Update total XP — upsert so a missing profile row is created rather than silently skipped
   const { data: prof } = await supabase
     .from('user_profiles')
     .select('total_xp')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   await supabase
     .from('user_profiles')
-    .update({ total_xp: (prof?.total_xp ?? 0) + xpToAdd })
-    .eq('id', userId);
+    .upsert({ id: userId, total_xp: (prof?.total_xp ?? 0) + xpToAdd }, { onConflict: 'id' });
 
   return newEarned;
 }

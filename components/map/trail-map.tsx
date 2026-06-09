@@ -295,7 +295,7 @@ export default function TrailMap({
   }, []);
 
   const naraCount     = entries.filter(e => e.tier === 1).length;
-  const visitedCount  = entries.filter(e => !!e.visitDate).length;
+  const visitedCount  = entries.filter(e => e.tier === 1 && !!e.visitDate).length;
 
   return (
     <div

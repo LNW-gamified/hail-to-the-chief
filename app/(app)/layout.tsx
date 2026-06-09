@@ -48,11 +48,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     }
   }
 
-  // Count distinct NARA libraries visited by this user
+  // Count distinct tier-1 (NARA) libraries visited by this user
   const { data: visitedRows } = await supabase
     .from('location_visits')
-    .select('location_id')
-    .eq('user_id', user?.id ?? '');
+    .select('location_id, presidential_locations!inner(tier)')
+    .eq('user_id', user?.id ?? '')
+    .eq('presidential_locations.tier', 1);
 
   const visitedCount = new Set(visitedRows?.map(r => r.location_id) ?? []).size;
 
