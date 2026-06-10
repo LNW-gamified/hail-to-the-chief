@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase-server';
 import { revalidatePath } from 'next/cache';
+import { getRank } from '@/lib/ranks';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,8 @@ export type LogVisitResult = {
   isHistoricDate: boolean;
   historicNote: string | null;
   earnedAchievements: EarnedAchievement[];
+  xpEarned: number;
+  rankUpTo: string | null;
   error?: string;
 };
 
@@ -92,7 +95,8 @@ export async function logVisit(input: LogVisitInput): Promise<LogVisitResult> {
     return {
       visitId: '', visitDate: '', weather: null,
       isHistoricDate: false, historicNote: null,
-      earnedAchievements: [], error: 'Not authenticated',
+      earnedAchievements: [], xpEarned: 0, rankUpTo: null,
+      error: 'Not authenticated',
     };
   }
 
@@ -118,7 +122,7 @@ export async function logVisit(input: LogVisitInput): Promise<LogVisitResult> {
     return {
       visitId: '', visitDate: '', weather: null,
       isHistoricDate: false, historicNote: null,
-      earnedAchievements: [],
+      earnedAchievements: [], xpEarned: 0, rankUpTo: null,
       error: insertErr?.message ?? 'Failed to save visit',
     };
   }
@@ -154,7 +158,7 @@ export async function logVisit(input: LogVisitInput): Promise<LogVisitResult> {
       .eq('id', visit.id);
   }
 
-  // Look up the location tier now so XP can be awarded regardless of what checkAndAward does
+  // Look up the location tier so XP can be awarded regardless of what checkAndAward does
   const { data: locData } = await supabase
     .from('presidential_locations')
     .select('tier')
@@ -162,24 +166,38 @@ export async function logVisit(input: LogVisitInput): Promise<LogVisitResult> {
     .maybeSingle();
   const locTier = (locData as { tier: number } | null)?.tier ?? 1;
 
-  // Award achievements (best-effort — don't fail the visit if this errors)
+  // Award achievements (best-effort — checkAndAward does NOT write XP; that happens below)
   const earnedAchievements = await checkAndAward(supabase, user.id, input, visit.id).catch(() => []);
 
-  // Award XP unconditionally here — outside checkAndAward so that early returns or
-  // exceptions inside that function can never silently skip the XP write.
-  const baseXP = locTier === 1 ? 50 : locTier === 2 ? 25 : 15;
-  const achXP  = earnedAchievements.reduce((s, a) => s + a.points, 0);
+  // XP sources
+  const hasNotes   = !!(input.notes);
+  const hasMoments = !!(input.moments?.length);
+  const hasPhotos  = !!(input.photoUrls?.length);
+  const hasFullLog = hasNotes && hasMoments && hasPhotos;
+
+  const baseXP         = locTier === 1 ? 50 : locTier === 2 ? 25 : 15;
+  const achXP          = earnedAchievements.reduce((s, a) => s + a.points, 0);
+  const bonusFullLog   = hasFullLog ? 10 : 0;
+  const bonusHistoric  = otdRow ? 25 : 0;
+  const bonusFullTrip  = locTier === 1 && hasFullLog ? 15 : 0;
+  const totalXP        = baseXP + achXP + bonusFullLog + bonusHistoric + bonusFullTrip;
+
   const { data: prof } = await supabase
     .from('user_profiles')
     .select('total_xp')
     .eq('id', user.id)
     .maybeSingle();
+
+  const oldXP = prof?.total_xp ?? 0;
+  const newXP = oldXP + totalXP;
+
   await supabase
     .from('user_profiles')
-    .upsert(
-      { id: user.id, total_xp: (prof?.total_xp ?? 0) + baseXP + achXP },
-      { onConflict: 'id' },
-    );
+    .upsert({ id: user.id, total_xp: newXP }, { onConflict: 'id' });
+
+  const oldRank = getRank(oldXP);
+  const newRank = getRank(newXP);
+  const rankUpTo = newRank.level > oldRank.level ? newRank.title : null;
 
   revalidatePath('/home');
   revalidatePath('/libraries');
@@ -193,6 +211,8 @@ export async function logVisit(input: LogVisitInput): Promise<LogVisitResult> {
     isHistoricDate: !!otdRow,
     historicNote: otdRow?.fact ?? null,
     earnedAchievements,
+    xpEarned: totalXP,
+    rankUpTo,
   };
 }
 
@@ -371,16 +391,6 @@ async function checkAndAward(
       });
     }
   }
-
-  // Update total XP — upsert so a missing profile row is created rather than silently skipped
-  const { data: prof } = await supabase
-    .from('user_profiles')
-    .select('total_xp')
-    .eq('id', userId)
-    .maybeSingle();
-  await supabase
-    .from('user_profiles')
-    .upsert({ id: userId, total_xp: (prof?.total_xp ?? 0) + xpToAdd }, { onConflict: 'id' });
 
   return newEarned;
 }

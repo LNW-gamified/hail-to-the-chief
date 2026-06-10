@@ -4,10 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home, Building2, Map, Plane, Trophy, BookOpen, User, Shield,
+  Home, Building2, Map, Plane, Trophy, BookOpen, User,
 } from 'lucide-react';
 import { getRank } from '@/lib/ranks';
 import { cn } from '@/lib/cn';
+import RankBadge from '@/components/rank/rank-badge';
 
 const NAV_LINKS = [
   { href: '/home',      label: 'Home',      Icon: Home      },
@@ -63,8 +64,11 @@ export default function Sidebar({ displayName, totalXp, upNext, visitedCount }: 
       {/* Rank badge */}
       <div className="mx-4 mb-3 bg-card border border-border rounded-xl p-4">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gold/15 text-gold shrink-0">
-            <Shield size={18} />
+          <div
+            className="shrink-0"
+            style={{ filter: 'drop-shadow(0 0 6px rgba(201,168,76,0.4))' }}
+          >
+            <RankBadge level={rank.level} size={36} />
           </div>
           <div className="min-w-0">
             <p className="font-display text-sm text-gold truncate">{rank.title}</p>

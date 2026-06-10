@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
 import { logVisit, type EarnedAchievement, type LogVisitResult } from '@/app/actions/log-visit';
+import RankUpModal from '@/components/rank/rank-up-modal';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -211,6 +212,7 @@ export default function LogVisitModal({
   const [savedMoments, setSavedMoments] = useState<string[]>([]);
   const [savedPhotos, setSavedPhotos] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [showRankUp, setShowRankUp] = useState(false);
 
   // Fetch NARA locations when modal is used from home page (no pre-filled loc)
   useEffect(() => {
@@ -336,6 +338,13 @@ export default function LogVisitModal({
   const displayName = initLocId
     ? (initLocName ?? 'This Library')
     : locations.find(l => l.id === selectedLocId)?.name ?? '';
+
+  useEffect(() => {
+    if (result?.rankUpTo) {
+      const t = setTimeout(() => setShowRankUp(true), 900);
+      return () => clearTimeout(t);
+    }
+  }, [result?.rankUpTo]);
 
   const step = phase === 'step1' ? 1 : phase === 'step2' ? 2 : 3;
 
@@ -696,6 +705,17 @@ export default function LogVisitModal({
               </div>
             )}
 
+            {/* XP earned */}
+            {result.xpEarned > 0 && (
+              <div
+                className="flex items-center justify-between rounded-xl px-4 py-3 border"
+                style={{ background: 'rgba(201,168,76,0.06)', borderColor: 'rgba(201,168,76,0.2)' }}
+              >
+                <p className="font-mono text-[10px] text-gold/60 tracking-widest">XP EARNED</p>
+                <p className="font-display text-2xl text-gold">+{result.xpEarned}</p>
+              </div>
+            )}
+
             {/* Achievements */}
             {result.earnedAchievements.length > 0 && (
               <div className="space-y-2">
@@ -737,6 +757,14 @@ export default function LogVisitModal({
           </div>
         )}
       </div>
+
+      {/* Rank-up celebration */}
+      {showRankUp && result?.rankUpTo && (
+        <RankUpModal
+          rankTitle={result.rankUpTo}
+          onClose={() => setShowRankUp(false)}
+        />
+      )}
     </div>
   );
 }

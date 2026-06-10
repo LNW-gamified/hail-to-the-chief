@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, X, ChevronRight, Trophy, RotateCcw, ArrowLeft } from 'lucide-react';
 import { PortraitImg } from '@/components/ui/portrait-img';
 import { submitQuiz } from '@/app/actions/submit-quiz';
 import { ERA_COLORS, ordinal } from '@/lib/era';
+import RankUpModal from '@/components/rank/rank-up-modal';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ type AnswerRecord = { isCorrect: boolean };
 type QuizResult = {
   xpEarned: number;
   achievements: { name: string; icon: string; points: number }[];
+  rankUpTo: string | null;
 };
 
 type Props = {
@@ -237,6 +239,14 @@ export default function QuizClient({ questions, president, locationId, bestPrior
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [result, setResult] = useState<QuizResult | null>(null);
+  const [showRankUp, setShowRankUp] = useState(false);
+
+  useEffect(() => {
+    if (result?.rankUpTo) {
+      const t = setTimeout(() => setShowRankUp(true), 700);
+      return () => clearTimeout(t);
+    }
+  }, [result?.rankUpTo]);
 
   const q = questions[currentQ];
   const isAnswered = selectedAnswer !== null;
@@ -260,10 +270,14 @@ export default function QuizClient({ questions, president, locationId, bestPrior
     } else {
       setPhase('submitting');
       const score = newAnswers.filter(a => a.isCorrect).length;
-      let res: QuizResult = { xpEarned: 0, achievements: [] };
+      let res: QuizResult = { xpEarned: 0, achievements: [], rankUpTo: null };
       try {
         const submitted = await submitQuiz(president.id, score, locationId);
-        res = { xpEarned: submitted.xpEarned, achievements: submitted.earnedAchievements };
+        res = {
+          xpEarned:     submitted.xpEarned,
+          achievements: submitted.earnedAchievements,
+          rankUpTo:     submitted.rankUpTo,
+        };
       } catch {
         // surface results without achievements on network error
       }
@@ -284,16 +298,24 @@ export default function QuizClient({ questions, president, locationId, bestPrior
 
   if (phase === 'results' && result) {
     return (
-      <ResultsScreen
-        score={answers.filter(a => a.isCorrect).length}
-        total={totalQ}
-        xpEarned={result.xpEarned}
-        achievements={result.achievements}
-        eraColor={eraColor}
-        president={president}
-        locationId={locationId}
-        onRetry={handleRetry}
-      />
+      <>
+        <ResultsScreen
+          score={answers.filter(a => a.isCorrect).length}
+          total={totalQ}
+          xpEarned={result.xpEarned}
+          achievements={result.achievements}
+          eraColor={eraColor}
+          president={president}
+          locationId={locationId}
+          onRetry={handleRetry}
+        />
+        {showRankUp && result.rankUpTo && (
+          <RankUpModal
+            rankTitle={result.rankUpTo}
+            onClose={() => setShowRankUp(false)}
+          />
+        )}
+      </>
     );
   }
 

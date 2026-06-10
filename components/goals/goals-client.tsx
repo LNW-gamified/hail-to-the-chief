@@ -7,6 +7,7 @@ import { Lock, Zap, Hand, Trophy, BookOpen, ChevronRight, X, Check } from 'lucid
 import { createClient } from '@/lib/supabase';
 import { ERA_COLORS } from '@/lib/era';
 import { PortraitImg } from '@/components/ui/portrait-img';
+import RankBadge from '@/components/rank/rank-badge';
 
 // ── exported types ────────────────────────────────────────────────────────────
 
@@ -801,7 +802,7 @@ export default function GoalsClient({
               className="w-36 h-36 md:w-44 md:h-44 shrink-0"
               style={{ filter: 'drop-shadow(0 0 16px rgba(201,168,76,0.45)) drop-shadow(0 0 32px rgba(201,168,76,0.2))' }}
             >
-              <RankShield level={rankInfo.level} />
+              <RankBadge level={rankInfo.level} size={144} />
             </div>
 
             {/* Rank info */}

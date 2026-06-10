@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase-server';
 import { revalidatePath } from 'next/cache';
+import { getRank } from '@/lib/ranks';
 
 export type EarnedAchievement = {
   name: string;
@@ -12,6 +13,7 @@ export type EarnedAchievement = {
 export type SubmitQuizResult = {
   xpEarned: number;
   earnedAchievements: EarnedAchievement[];
+  rankUpTo: string | null;
   error?: string;
 };
 
@@ -27,7 +29,7 @@ export async function submitQuiz(
 ): Promise<SubmitQuizResult> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { xpEarned: 0, earnedAchievements: [], error: 'Not authenticated' };
+  if (!user) return { xpEarned: 0, earnedAchievements: [], rankUpTo: null, error: 'Not authenticated' };
 
   await supabase.from('trivia_scores').insert({
     user_id: user.id,
@@ -111,23 +113,28 @@ export async function submitQuiz(
 
   const totalXP = baseXP + achXP;
 
+  const { data: prof } = await supabase
+    .from('user_profiles')
+    .select('total_xp')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const oldXP = prof?.total_xp ?? 0;
+  const newXP = oldXP + totalXP;
+
   if (totalXP > 0) {
-    const { data: prof } = await supabase
-      .from('user_profiles')
-      .select('total_xp')
-      .eq('id', user.id)
-      .maybeSingle();
     await supabase
       .from('user_profiles')
-      .upsert(
-        { id: user.id, total_xp: (prof?.total_xp ?? 0) + totalXP },
-        { onConflict: 'id' },
-      );
+      .upsert({ id: user.id, total_xp: newXP }, { onConflict: 'id' });
   }
+
+  const oldRank = getRank(oldXP);
+  const newRankData = getRank(newXP);
+  const rankUpTo = newRankData.level > oldRank.level ? newRankData.title : null;
 
   revalidatePath(`/libraries/${locationId}`);
   revalidatePath('/goals');
   revalidatePath('/home');
 
-  return { xpEarned: totalXP, earnedAchievements: newEarned };
+  return { xpEarned: totalXP, earnedAchievements: newEarned, rankUpTo };
 }
