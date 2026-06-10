@@ -154,8 +154,32 @@ export async function logVisit(input: LogVisitInput): Promise<LogVisitResult> {
       .eq('id', visit.id);
   }
 
+  // Look up the location tier now so XP can be awarded regardless of what checkAndAward does
+  const { data: locData } = await supabase
+    .from('presidential_locations')
+    .select('tier')
+    .eq('id', input.locationId)
+    .maybeSingle();
+  const locTier = (locData as { tier: number } | null)?.tier ?? 1;
+
   // Award achievements (best-effort — don't fail the visit if this errors)
   const earnedAchievements = await checkAndAward(supabase, user.id, input, visit.id).catch(() => []);
+
+  // Award XP unconditionally here — outside checkAndAward so that early returns or
+  // exceptions inside that function can never silently skip the XP write.
+  const baseXP = locTier === 1 ? 50 : locTier === 2 ? 25 : 15;
+  const achXP  = earnedAchievements.reduce((s, a) => s + a.points, 0);
+  const { data: prof } = await supabase
+    .from('user_profiles')
+    .select('total_xp')
+    .eq('id', user.id)
+    .maybeSingle();
+  await supabase
+    .from('user_profiles')
+    .upsert(
+      { id: user.id, total_xp: (prof?.total_xp ?? 0) + baseXP + achXP },
+      { onConflict: 'id' },
+    );
 
   revalidatePath('/home');
   revalidatePath('/libraries');

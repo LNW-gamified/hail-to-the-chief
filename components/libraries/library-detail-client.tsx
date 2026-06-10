@@ -586,9 +586,11 @@ function LibraryTab({ location }: { location: LocationData }) {
 function TriviaSection({
   president,
   bestScore,
+  locationId,
 }: {
   president: PresidentData;
   bestScore: { score: number; completedAt: string } | null;
+  locationId: string;
 }) {
   return (
     <div className="bg-card border border-border rounded-2xl p-6">
@@ -612,9 +614,12 @@ function TriviaSection({
             </div>
           )}
         </div>
-        <button className="font-mono text-sm font-bold bg-gold/10 border border-gold/30 text-gold rounded-xl px-5 py-2.5 hover:bg-gold/15 transition-colors">
+        <Link
+          href={`/libraries/${locationId}/quiz`}
+          className="font-mono text-sm font-bold bg-gold/10 border border-gold/30 text-gold rounded-xl px-5 py-2.5 hover:bg-gold/15 transition-colors"
+        >
           Take Quiz
-        </button>
+        </Link>
       </div>
     </div>
   );
@@ -987,7 +992,7 @@ export default function LibraryDetailClient({
 
           {/* ── trivia ── */}
           {p && (
-            <TriviaSection president={p} bestScore={bestTriviaScore} />
+            <TriviaSection president={p} bestScore={bestTriviaScore} locationId={location.id} />
           )}
 
           {/* ── nearby sites ── */}
