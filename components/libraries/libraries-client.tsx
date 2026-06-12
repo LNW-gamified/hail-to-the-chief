@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Trophy, Building2 } from 'lucide-react';
+import { Trophy, Building2, MapPin } from 'lucide-react';
 import { ERA_COLORS, ERA_LABELS, ordinal } from '@/lib/era';
 import { PortraitImg } from '@/components/ui/portrait-img';
 
@@ -16,6 +16,7 @@ export type LibraryEntry = {
   city: string;
   state: string;
   imageUrl: string | null;
+  yearEstablished: number | null;
   president: {
     number: number;
     name: string;
@@ -155,6 +156,152 @@ function LibraryCard({ entry }: { entry: LibraryEntry }) {
               <p className="font-serif text-sm italic mt-2 truncate" style={{ color: '#C9A84C' }}>
                 &ldquo;{p.tagline}&rdquo;
               </p>
+            )}
+
+            {visitLabel && (
+              <p className="font-mono text-[11px] text-gold mt-2">
+                Visited {visitLabel}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* VISITED stamp */}
+        {visited ? (
+          <div className="absolute bottom-3 right-3 pointer-events-none select-none">
+            <div
+              className="flex items-center justify-center rounded border-2"
+              style={{
+                background: '#CC0000',
+                borderColor: '#FF2020',
+                transform: 'rotate(-12deg)',
+                minWidth: '72px',
+                padding: '3px 10px',
+              }}
+            >
+              <span className="font-mono text-[14px] font-bold tracking-[0.15em] text-white">
+                VISITED
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="absolute top-3 right-3 pointer-events-none">
+            <span className="font-mono text-[11px]" style={{ color: '#8BA4BC' }}>
+              Not Yet
+            </span>
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+// ── site card (tier 2 & 3) ────────────────────────────────────────────────────
+
+const EXPERIENCE_SUBTITLES: Record<string, string> = {
+  'The White House':                             'Official Residence of the President',
+  'National Archives Museum':                    'Home of America\'s Founding Documents',
+  'Arlington National Cemetery':                 'National Cemetery & Memorial',
+  'United States Capitol':                       'Site of Every Presidential Inauguration',
+  'Vietnam Veterans Memorial':                   'Honoring 58,318 American Veterans',
+  'Korean War Veterans Memorial':                'Honoring the Forgotten War Veterans',
+  'Martin Luther King Jr. Memorial':             'Honoring Dr. Martin Luther King Jr.',
+  'Martin Luther King Jr. National Historical Park': 'Honoring Dr. Martin Luther King Jr.',
+  'Mount Rushmore National Memorial':            'Honoring Four Great American Presidents',
+  'The Sixth Floor Museum at Dealey Plaza':      'Site of President Kennedy\'s Assassination',
+  'Franklin Delano Roosevelt Memorial':          'Honoring Franklin Delano Roosevelt',
+};
+
+function siteSubtitle(entry: LibraryEntry): string {
+  const name = entry.president?.name;
+  switch (entry.locationType) {
+    case 'home':         return name ? `Home of ${name}` : 'Historic Home';
+    case 'birthplace':   return name ? `Birthplace of ${name}` : 'Historic Birthplace';
+    case 'historic_site': return name ? `${name} Historic Site` : 'National Historic Site';
+    case 'monument':     return name ? `Honoring ${name}` : 'National Memorial';
+    case 'nara_library': return 'Presidential Library & Museum';
+    default:             return EXPERIENCE_SUBTITLES[entry.name] ?? 'National Historic Site';
+  }
+}
+
+function SiteCard({ entry }: { entry: LibraryEntry }) {
+  const { visitDate, yearEstablished } = entry;
+  const visited = !!visitDate;
+  const subtitle = siteSubtitle(entry);
+  const isDedicated = entry.locationType === 'monument';
+
+  const visitLabel = visitDate
+    ? new Date(visitDate + 'T00:00:00').toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+      })
+    : null;
+
+  return (
+    <Link href={`/libraries/${entry.id}`} className="block group">
+      <div
+        className={[
+          'relative bg-card rounded-xl overflow-hidden border transition-all duration-200',
+          'group-hover:border-gold/40 group-hover:translate-y-[-1px]',
+          visited
+            ? 'border-gold/30'
+            : 'border-border opacity-70 group-hover:opacity-90',
+        ].join(' ')}
+        style={visited ? { boxShadow: '0 0 18px rgba(201,168,76,0.10)' } : undefined}
+      >
+        <div className="flex" style={{ minHeight: 140 }}>
+
+          {/* Site photo — full card height, left side */}
+          <div
+            className="relative shrink-0 overflow-hidden"
+            style={{ width: 110, borderRight: '2px solid rgba(201,168,76,0.35)' }}
+          >
+            <PortraitImg
+              src={entry.imageUrl}
+              alt={entry.name}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center center' }}
+              fallback={
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ background: '#0D1E33' }}
+                >
+                  <MapPin size={28} style={{ color: 'rgba(201,168,76,0.45)' }} />
+                </div>
+              }
+            />
+          </div>
+
+          {/* Card content */}
+          <div className="flex-1 min-w-0 pl-4 pr-3 py-4">
+            {/* Name */}
+            <h3 className="font-display text-base font-bold text-cream leading-tight line-clamp-2">
+              {entry.name}
+            </h3>
+
+            {/* Association / subtitle */}
+            <p className="font-mono text-[11px] mt-0.5" style={{ color: '#8BA4BC' }}>
+              {subtitle}
+            </p>
+
+            {/* City, State */}
+            <p className="font-mono text-[13px] mt-1.5" style={{ color: '#8BA4BC' }}>
+              {entry.city}, {entry.state}
+            </p>
+
+            {/* Year badge */}
+            {yearEstablished && (
+              <div className="mt-2">
+                <span
+                  className="font-mono text-[11px] px-2 py-0.5 rounded-full font-semibold"
+                  style={{
+                    backgroundColor: 'rgba(201,168,76,0.12)',
+                    color: '#F5F0E8',
+                    border: '1px solid rgba(201,168,76,0.30)',
+                  }}
+                >
+                  {isDedicated ? 'Dedicated' : 'Est.'} {yearEstablished}
+                </span>
+              </div>
             )}
 
             {visitLabel && (
@@ -339,11 +486,15 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
       {/* ── single-section (Visited / Not Yet tabs) ── */}
       {singleSection && sorted.length > 0 && (
         <div className="space-y-4">
-          {sorted.map(e => <LibraryCard key={e.id} entry={e} />)}
+          {sorted.map(e =>
+            e.tier === 1
+              ? <LibraryCard key={e.id} entry={e} />
+              : <SiteCard    key={e.id} entry={e} />
+          )}
         </div>
       )}
 
-      {/* ── two-section layout (All / NARA / Sites) ── */}
+      {/* ── two-section layout (All / NARA / Sites / Monuments) ── */}
       {!singleSection && (
         <div className="space-y-8">
           {visitedItems.length > 0 && (
@@ -355,7 +506,11 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
                 </h2>
               </div>
               <div className="space-y-4">
-                {visitedItems.map(e => <LibraryCard key={e.id} entry={e} />)}
+                {visitedItems.map(e =>
+                  e.tier === 1
+                    ? <LibraryCard key={e.id} entry={e} />
+                    : <SiteCard    key={e.id} entry={e} />
+                )}
               </div>
             </section>
           )}
@@ -368,7 +523,11 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
                 </h2>
               </div>
               <div className="space-y-4">
-                {notYetItems.map(e => <LibraryCard key={e.id} entry={e} />)}
+                {notYetItems.map(e =>
+                  e.tier === 1
+                    ? <LibraryCard key={e.id} entry={e} />
+                    : <SiteCard    key={e.id} entry={e} />
+                )}
               </div>
             </section>
           )}

@@ -16,7 +16,7 @@ export default async function LibrariesPage() {
     supabase
       .from('presidential_locations')
       .select(`
-        id, name, location_type, tier, city, state, image_url,
+        id, name, location_type, tier, city, state, image_url, year_established,
         presidents (
           number, name, term_start, term_end,
           era, tagline, historian_ranking, portrait_url, party
@@ -56,6 +56,7 @@ export default async function LibrariesPage() {
       city: loc.city,
       state: loc.state,
       imageUrl: loc.image_url,
+      yearEstablished: (loc as { year_established?: number | null }).year_established ?? null,
       president: p ? {
         number:           p.number,
         name:             p.name,
