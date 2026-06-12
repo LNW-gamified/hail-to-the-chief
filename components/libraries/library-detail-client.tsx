@@ -59,6 +59,7 @@ export type LocationData = {
   collectionSize: string | null;
   annualVisitors: string | null;
   yearOpened: number | null;
+  yearEstablished: number | null;
   president: PresidentData | null;
 };
 
@@ -661,6 +662,46 @@ function NearbySitesSection({ nearby }: { nearby: NearbyLocation[] }) {
   );
 }
 
+// ── site hero helpers (tier 2 & 3) ────────────────────────────────────────────
+
+const SITE_HERO_SUBTITLES: Record<string, string> = {
+  'The White House':                                 'Official Residence of the President',
+  'National Archives Museum':                        'Home of America\'s Founding Documents',
+  'Arlington National Cemetery':                     'National Cemetery & Memorial',
+  'United States Capitol':                           'Site of Every Presidential Inauguration',
+  'Vietnam Veterans Memorial':                       'Honoring 58,318 American Veterans',
+  'Korean War Veterans Memorial':                    'Honoring the Forgotten War Veterans',
+  'Martin Luther King Jr. Memorial':                 'Honoring Dr. Martin Luther King Jr.',
+  'Martin Luther King Jr. National Historical Park': 'Honoring Dr. Martin Luther King Jr.',
+  'Mount Rushmore National Memorial':                'Honoring Four Great American Presidents',
+  'The Sixth Floor Museum at Dealey Plaza':          'Site of President Kennedy\'s Assassination',
+  'Franklin Delano Roosevelt Memorial':              'Honoring Franklin Delano Roosevelt',
+};
+
+function siteHeroSubtitle(location: LocationData): string {
+  const name = location.president?.name;
+  switch (location.locationType) {
+    case 'home':          return name ? `Home of ${name}` : 'Historic Home';
+    case 'birthplace':    return name ? `Birthplace of ${name}` : 'Historic Birthplace';
+    case 'historic_site': return name ? `${name} Historic Site` : 'National Historic Site';
+    case 'monument':      return name ? `Honoring ${name}` : 'National Memorial';
+    case 'nara_library':  return 'Presidential Library & Museum';
+    default:              return SITE_HERO_SUBTITLES[location.name] ?? 'National Historic Site';
+  }
+}
+
+function locTypeLabel(locationType: string): string {
+  const labels: Record<string, string> = {
+    home:         'Historic Home',
+    birthplace:   'Historic Birthplace',
+    historic_site:'National Historic Site',
+    monument:     'National Monument',
+    experience:   'National Site',
+    nara_library: 'Presidential Library',
+  };
+  return labels[locationType] ?? 'Historic Site';
+}
+
 // ── main export ────────────────────────────────────────────────────────────────
 
 const HISTORIC_DAY_EMOJI: Record<string, string> = {
@@ -744,112 +785,116 @@ export default function LibraryDetailClient({
       <div className="pb-10">
 
         {/* ── hero ── */}
-        {/* outer wrapper: no overflow-hidden so portrait can overlap below */}
-        <div className="relative" style={{ height: 380 }}>
-
-          {/* building photo bg — clipped inside hero */}
-          <div className="absolute inset-0 overflow-hidden">
-            {location.imageUrl ? (
-              <img
-                src={location.imageUrl}
-                alt={location.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div
-                className="w-full h-full"
-                style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }}
-              />
-            )}
-            {/* dark gradient so text is readable */}
-            <div
-              className="absolute inset-0"
-              style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A1628 100%)' }}
-            />
-            {/* presidential seal watermark */}
-            <img
-              src="/presidential-seal.svg"
-              alt=""
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 opacity-[0.06] pointer-events-none select-none"
-            />
-            {/* era accent line */}
-            <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: eraColor }} />
-          </div>
-
-          {/* text overlay — bottom-left, right-padded to clear portrait */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5 pr-36">
-            {p?.era && (
-              <span
-                className="inline-block font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full mb-2"
-                style={{
-                  backgroundColor: eraColor + '4D',
-                  color: '#F5F0E8',
-                  border: `1px solid ${eraColor}CC`,
-                }}
-              >
-                {ERA_LABELS[p.era] ?? p.era}
-              </span>
-            )}
-            <h1 className="font-display text-4xl md:text-5xl text-white leading-tight mb-1">
-              {p?.name ?? location.name}
-            </h1>
-            {p && (
-              <p className="font-mono text-sm mb-3" style={{ color: '#C9A84C' }}>
-                {ordinal(p.number)} President of the United States
-              </p>
-            )}
-            <div className="flex flex-wrap gap-2">
+        {location.tier === 1 ? (
+          /* ── tier 1: president-style hero with portrait overlap ── */
+          <div className="relative" style={{ height: 380 }}>
+            <div className="absolute inset-0 overflow-hidden">
+              {location.imageUrl ? (
+                <img src={location.imageUrl} alt={location.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }} />
+              )}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A1628 100%)' }} />
+              <img src="/presidential-seal.svg" alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 opacity-[0.06] pointer-events-none select-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: eraColor }} />
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5 pr-36">
+              {p?.era && (
+                <span
+                  className="inline-block font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full mb-2"
+                  style={{ backgroundColor: eraColor + '4D', color: '#F5F0E8', border: `1px solid ${eraColor}CC` }}
+                >
+                  {ERA_LABELS[p.era] ?? p.era}
+                </span>
+              )}
+              <h1 className="font-display text-4xl md:text-5xl text-white leading-tight mb-1">
+                {p?.name ?? location.name}
+              </h1>
               {p && (
-                <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
-                  {p.termStart}–{p.termEnd ?? 'present'}
-                </span>
+                <p className="font-mono text-sm mb-3" style={{ color: '#C9A84C' }}>
+                  {ordinal(p.number)} President of the United States
+                </p>
               )}
-              {p?.party && (
-                <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
-                  {p.party}
-                </span>
-              )}
-              {p?.homeState && (
-                <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
-                  {p.homeState}
-                </span>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {p && (
+                  <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
+                    {p.termStart}–{p.termEnd ?? 'present'}
+                  </span>
+                )}
+                {p?.party && (
+                  <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
+                    {p.party}
+                  </span>
+                )}
+                {p?.homeState && (
+                  <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
+                    {p.homeState}
+                  </span>
+                )}
+              </div>
+            </div>
+            {/* portrait circle — overlaps below hero */}
+            <div className="absolute z-50" style={{ bottom: 0, right: 20, transform: 'translateY(50%)' }}>
+              <div
+                className="w-[120px] h-[120px] rounded-full overflow-hidden"
+                style={{ border: '4px solid #C9A84C', boxShadow: '0 0 20px rgba(201, 168, 76, 0.5)' }}
+              >
+                <PortraitImg
+                  src={p?.portraitUrl}
+                  alt={p?.name ?? ''}
+                  className="w-full h-full object-cover object-top"
+                  fallback={
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: eraColor + '33' }}>
+                      <span className="font-mono text-2xl font-bold" style={{ color: eraColor }}>{initials}</span>
+                    </div>
+                  }
+                />
+              </div>
             </div>
           </div>
-
-          {/* portrait circle — bottom-right, half-overlapping below hero */}
-          <div
-            className="absolute z-50"
-            style={{ bottom: 0, right: 20, transform: 'translateY(50%)' }}
-          >
-            <div
-              className="w-[120px] h-[120px] rounded-full overflow-hidden"
-              style={{
-                border: '4px solid #C9A84C',
-                boxShadow: '0 0 20px rgba(201, 168, 76, 0.5)',
-              }}
-            >
-              <PortraitImg
-                src={p?.portraitUrl}
-                alt={p?.name ?? ''}
-                className="w-full h-full object-cover object-top"
-                fallback={
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    style={{ background: eraColor + '33' }}
-                  >
-                    <span className="font-mono text-2xl font-bold" style={{ color: eraColor }}>
-                      {initials}
-                    </span>
-                  </div>
-                }
-              />
+        ) : (
+          /* ── tier 2/3: site/monument hero — full-bleed photo, no portrait ── */
+          <div className="relative" style={{ height: 320 }}>
+            <div className="absolute inset-0 overflow-hidden">
+              {location.imageUrl ? (
+                <img src={location.imageUrl} alt={location.name} className="w-full h-full object-cover object-center" />
+              ) : (
+                <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }} />
+              )}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, #0A1628 100%)' }} />
+              <img src="/presidential-seal.svg" alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 opacity-[0.04] pointer-events-none select-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: 'rgba(201,168,76,0.5)' }} />
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5">
+              {/* year badge replaces era badge */}
+              {location.yearEstablished && (
+                <span
+                  className="inline-block font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full mb-2"
+                  style={{ backgroundColor: 'rgba(201,168,76,0.20)', color: '#F5F0E8', border: '1px solid rgba(201,168,76,0.50)' }}
+                >
+                  {location.locationType === 'monument' ? 'Dedicated' : 'Est.'} {location.yearEstablished}
+                </span>
+              )}
+              <h1 className="font-display text-3xl md:text-4xl text-white leading-tight mb-1">
+                {location.name}
+              </h1>
+              <p className="font-mono text-sm mb-3" style={{ color: '#C9A84C' }}>
+                {siteHeroSubtitle(location)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
+                  {locTypeLabel(location.locationType)}
+                </span>
+                <span className="font-mono text-xs bg-black/30 text-cream/70 border border-white/10 rounded-full px-3 py-1">
+                  {location.city}, {location.state}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* ── mark visited — full-width button below hero, clearing portrait overlap ── */}
-        <div className="px-4 pt-20 pb-2">
+        {/* ── mark visited — full-width button below hero ── */}
+        <div className={`px-4 ${location.tier === 1 ? 'pt-20' : 'pt-6'} pb-2`}>
           {!visited ? (
             <button
               onClick={() => setShowModal(true)}

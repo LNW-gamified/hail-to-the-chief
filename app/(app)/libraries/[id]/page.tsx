@@ -50,7 +50,7 @@ export default async function LibraryDetailPage({
         id, name, location_type, tier, address, city, state,
         latitude, longitude, description, hours, admission,
         website_url, image_url, signature_exhibits,
-        collection_size, annual_visitors, year_opened,
+        collection_size, annual_visitors, year_opened, year_established,
         presidents (
           id, number, name, first_name, last_name, nickname,
           term_start, term_end, party, home_state,
@@ -133,6 +133,7 @@ export default async function LibraryDetailPage({
     collectionSize:   rawLocation.collection_size,
     annualVisitors:   rawLocation.annual_visitors,
     yearOpened:       rawLocation.year_opened,
+    yearEstablished:  (rawLocation as { year_established?: number | null }).year_established ?? null,
     president,
   };
 
