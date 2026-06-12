@@ -3,6 +3,7 @@ import Sidebar from '@/components/nav/sidebar';
 import BottomNav from '@/components/nav/bottom-nav';
 import MobileUpNext from '@/components/nav/mobile-up-next';
 import AppHeader from '@/components/nav/app-header';
+import AppProviders from '@/components/providers/app-providers';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -61,24 +62,26 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const totalXp = profile?.total_xp ?? 0;
 
   return (
-    <div className="flex h-screen bg-navy overflow-hidden">
-      <Sidebar
-        displayName={displayName}
-        totalXp={totalXp}
-        upNext={upNext}
-        visitedCount={visitedCount}
-      />
+    <AppProviders>
+      <div className="flex h-screen bg-navy overflow-hidden">
+        <Sidebar
+          displayName={displayName}
+          totalXp={totalXp}
+          upNext={upNext}
+          visitedCount={visitedCount}
+        />
 
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <AppHeader displayName={displayName} />
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+          <AppHeader displayName={displayName} />
 
-        <main className="flex-1 overflow-y-auto pb-32 md:pb-0">
-          {children}
-        </main>
+          <main className="flex-1 overflow-y-auto pb-32 md:pb-0">
+            {children}
+          </main>
 
-        <MobileUpNext upNext={upNext} />
-        <BottomNav />
+          <MobileUpNext upNext={upNext} />
+          <BottomNav />
+        </div>
       </div>
-    </div>
+    </AppProviders>
   );
 }

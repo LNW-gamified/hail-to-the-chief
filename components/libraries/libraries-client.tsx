@@ -33,15 +33,16 @@ export type LibraryEntry = {
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
-type Filter = 'all' | 'nara' | 'sites' | 'visited' | 'not_yet';
+type Filter = 'nara' | 'sites' | 'monuments' | 'all' | 'visited' | 'not_yet';
 type Sort   = 'chronological' | 'geographical' | 'recently_visited';
 
 const FILTER_LABELS: Record<Filter, string> = {
-  nara:     'NARA (15)',
-  all:      'All Locations',
-  sites:    'Historic Sites',
-  visited:  'Visited',
-  not_yet:  'Not Yet',
+  nara:      'NARA Libraries',
+  sites:     'Historic Sites',
+  monuments: 'Monuments',
+  all:       'All Locations',
+  visited:   'Visited',
+  not_yet:   'Not Yet',
 };
 
 const SORT_LABELS: Record<Sort, string> = {
@@ -207,11 +208,12 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
   // ── filter ──────────────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     switch (filter) {
-      case 'nara':     return entries.filter(e => e.tier === 1);
-      case 'sites':    return entries.filter(e => e.tier !== 1);
-      case 'visited':  return entries.filter(e => !!e.visitDate);
-      case 'not_yet':  return entries.filter(e => !e.visitDate);
-      default:         return entries;
+      case 'nara':      return entries.filter(e => e.tier === 1);
+      case 'sites':     return entries.filter(e => e.tier === 2);
+      case 'monuments': return entries.filter(e => e.tier === 3);
+      case 'visited':   return entries.filter(e => !!e.visitDate);
+      case 'not_yet':   return entries.filter(e => !e.visitDate);
+      default:          return entries;
     }
   }, [entries, filter]);
 
@@ -238,7 +240,7 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
   }, [filtered, sort]);
 
   // ── split visited / not yet ─────────────────────────────────────────────────
-  const showSplit  = filter === 'all' || filter === 'nara' || filter === 'sites';
+  const showSplit  = filter === 'all' || filter === 'nara' || filter === 'sites' || filter === 'monuments';
   const visitedItems  = showSplit ? sorted.filter(e => !!e.visitDate) : [];
   const notYetItems   = showSplit ? sorted.filter(e => !e.visitDate)  : sorted;
   const singleSection = !showSplit;
@@ -263,25 +265,47 @@ export default function LibrariesClient({ entries }: { entries: LibraryEntry[] }
       {/* ── controls ── */}
       <div className="space-y-3">
         {/* filter tabs */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          {(Object.keys(FILTER_LABELS) as Filter[]).map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={[
-                'font-mono text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors shrink-0',
-                filter === f
-                  ? 'bg-gold text-navy font-bold'
-                  : 'bg-border/40 text-cream/50 hover:text-cream hover:bg-border/60',
-              ].join(' ')}
-            >
-              {f === 'nara'
-                ? `NARA (${naraCount})`
-                : f === 'visited'
+        <div className="space-y-2">
+          {/* primary: tier tabs */}
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
+            {(['nara', 'sites', 'monuments'] as Filter[]).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={[
+                  'font-mono text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors shrink-0',
+                  filter === f
+                    ? 'bg-gold text-navy font-bold'
+                    : 'bg-border/40 text-cream/50 hover:text-cream hover:bg-border/60',
+                ].join(' ')}
+              >
+                {f === 'nara'
+                  ? `NARA Libraries (${naraCount})`
+                  : f === 'sites'
+                    ? `Historic Sites (${entries.filter(e => e.tier === 2).length})`
+                    : `Monuments (${entries.filter(e => e.tier === 3).length})`}
+              </button>
+            ))}
+          </div>
+          {/* secondary: status filters */}
+          <div className="flex gap-1.5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+            {(['all', 'visited', 'not_yet'] as Filter[]).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={[
+                  'font-mono text-[11px] px-2.5 py-1 rounded-lg whitespace-nowrap transition-colors shrink-0',
+                  filter === f
+                    ? 'text-gold bg-gold/10 border border-gold/25'
+                    : 'text-cream/35 hover:text-cream/60',
+                ].join(' ')}
+              >
+                {f === 'visited'
                   ? `Visited (${entries.filter(e => !!e.visitDate).length})`
                   : FILTER_LABELS[f]}
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* sort row */}

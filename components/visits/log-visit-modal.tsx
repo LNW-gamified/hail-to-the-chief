@@ -7,6 +7,7 @@ import {
 import { createClient } from '@/lib/supabase';
 import { logVisit, type EarnedAchievement, type LogVisitResult } from '@/app/actions/log-visit';
 import RankUpModal from '@/components/rank/rank-up-modal';
+import { useToast } from '@/components/ui/achievement-toast';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -180,6 +181,7 @@ export default function LogVisitModal({
   onClose,
   onSuccess,
 }: LogVisitModalProps) {
+  const { addToast } = useToast();
   const today = new Date().toISOString().split('T')[0];
   const scrollRef = useRef<HTMLDivElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -328,6 +330,7 @@ export default function LogVisitModal({
       setSavedNotes(notes);
       setSavedMoments([...moments]);
       setSavedPhotos(photoUrls);
+      for (const ach of res.earnedAchievements) addToast(ach);
       goTo('success');
     } catch {
       setError('Something went wrong. Please try again.');

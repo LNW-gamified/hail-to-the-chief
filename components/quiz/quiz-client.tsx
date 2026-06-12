@@ -8,6 +8,7 @@ import { PortraitImg } from '@/components/ui/portrait-img';
 import { submitQuiz } from '@/app/actions/submit-quiz';
 import { ERA_COLORS, ordinal } from '@/lib/era';
 import RankUpModal from '@/components/rank/rank-up-modal';
+import { useToast } from '@/components/ui/achievement-toast';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -231,6 +232,7 @@ function ResultsScreen({
 
 export default function QuizClient({ questions, president, locationId, bestPriorScore }: Props) {
   const router = useRouter();
+  const { addToast } = useToast();
   const eraColor = ERA_COLORS[president.era ?? ''] ?? '#C9A84C';
   const totalQ = questions.length;
 
@@ -278,6 +280,7 @@ export default function QuizClient({ questions, president, locationId, bestPrior
           achievements: submitted.earnedAchievements,
           rankUpTo:     submitted.rankUpTo,
         };
+        for (const ach of submitted.earnedAchievements) addToast(ach);
       } catch {
         // surface results without achievements on network error
       }

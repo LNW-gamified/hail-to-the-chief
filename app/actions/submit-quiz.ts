@@ -4,11 +4,8 @@ import { createClient } from '@/lib/supabase-server';
 import { revalidatePath } from 'next/cache';
 import { getRank } from '@/lib/ranks';
 
-export type EarnedAchievement = {
-  name: string;
-  icon: string;
-  points: number;
-};
+import type { EarnedAchievement } from '@/lib/achievements';
+export type { EarnedAchievement };
 
 export type SubmitQuizResult = {
   xpEarned: number;

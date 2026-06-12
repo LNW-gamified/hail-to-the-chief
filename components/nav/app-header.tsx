@@ -32,7 +32,7 @@ export default function AppHeader({ displayName }: Props) {
       {/* Mobile: logo */}
       <div className="md:hidden flex items-center gap-2">
         <Image
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Seal_of_the_President_of_the_United_States.svg/240px-Seal_of_the_President_of_the_United_States.svg.png"
+          src="/presidential-seal.svg"
           alt="Presidential Seal"
           width={32}
           height={32}
