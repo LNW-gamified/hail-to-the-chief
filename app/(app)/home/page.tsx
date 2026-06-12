@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Building2, Landmark, MapPin, Zap, Navigation, Shield, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase-server';
 import { getRank } from '@/lib/ranks';
+import { pacificToday, pacificMonthDay, pacificHour, pacificDateLabel } from '@/lib/dates';
 import ProgressRing from '@/components/home/progress-ring';
 import XpBar from '@/components/home/xp-bar';
 import HomeLogVisitButton from '@/components/home/log-visit-button';
@@ -12,17 +13,11 @@ const TOTAL_NARA = 15;
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function greeting(name: string | null): string {
-  const h = new Date().getHours();
+  const h = pacificHour();
   const first = name?.split(' ')[0] ?? 'Chief';
   if (h < 12) return `Good morning, ${first}`;
   if (h < 17) return `Good afternoon, ${first}`;
   return `Good evening, ${first}`;
-}
-
-function formatDate(d: Date): string {
-  return d.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-  });
 }
 
 function daysAway(dateStr: string): number {
@@ -54,8 +49,8 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = pacificToday();
+  const { month: todayMonth, day: todayDay } = pacificMonthDay();
 
   // ── parallel fetches ──────────────────────────────────────────────────────
   const [
@@ -85,8 +80,8 @@ export default async function HomePage() {
     supabase
       .from('on_this_day')
       .select('fact, year, category, presidents(name, number, portrait_url)')
-      .eq('month', today.getMonth() + 1)
-      .eq('day', today.getDate())
+      .eq('month', todayMonth)
+      .eq('day', todayDay)
       .limit(3),
 
     supabase
@@ -243,7 +238,7 @@ export default async function HomePage() {
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-3">
             {greeting(displayName)}
           </h2>
-          <p className="font-mono text-sm text-cream/40">{formatDate(today)}</p>
+          <p className="font-mono text-sm text-cream/40">{pacificDateLabel()}</p>
         </div>
       </section>
 
@@ -437,7 +432,7 @@ export default async function HomePage() {
                     INTELLIGENCE BRIEFING
                   </p>
                 </div>
-                <p className="font-mono text-[10px] text-cream/30">{formatDate(today)} · FOR YOUR EYES ONLY</p>
+                <p className="font-mono text-[10px] text-cream/30">{pacificDateLabel()} · FOR YOUR EYES ONLY</p>
               </div>
               <div className="w-9 h-9 bg-red/10 border border-red/20 rounded-lg flex items-center justify-center shrink-0">
                 <span className="font-mono text-xs text-red font-bold">TS</span>

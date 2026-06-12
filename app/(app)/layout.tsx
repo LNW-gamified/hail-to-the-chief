@@ -4,6 +4,7 @@ import BottomNav from '@/components/nav/bottom-nav';
 import MobileUpNext from '@/components/nav/mobile-up-next';
 import AppHeader from '@/components/nav/app-header';
 import AppProviders from '@/components/providers/app-providers';
+import { pacificToday } from '@/lib/dates';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -18,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .maybeSingle();
 
   // Fetch next planned trip stop
-  const today = new Date().toISOString().split('T')[0];
+  const today = pacificToday();
 
   const { data: activeTripIds } = await supabase
     .from('trips')
