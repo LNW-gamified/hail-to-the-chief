@@ -789,11 +789,14 @@ export default function LibraryDetailClient({
           /* ── tier 1: president-style hero with portrait overlap ── */
           <div className="relative" style={{ height: 380 }}>
             <div className="absolute inset-0 overflow-hidden">
-              {location.imageUrl ? (
-                <img src={location.imageUrl} alt={location.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }} />
-              )}
+              <PortraitImg
+                src={location.imageUrl}
+                alt={location.name}
+                className="absolute inset-0 w-full h-full object-cover"
+                fallback={
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }} />
+                }
+              />
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A1628 100%)' }} />
               <img src="/presidential-seal.svg" alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 opacity-[0.06] pointer-events-none select-none" />
               <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: eraColor }} />
@@ -856,11 +859,14 @@ export default function LibraryDetailClient({
           /* ── tier 2/3: site/monument hero — full-bleed photo, no portrait ── */
           <div className="relative" style={{ height: 320 }}>
             <div className="absolute inset-0 overflow-hidden">
-              {location.imageUrl ? (
-                <img src={location.imageUrl} alt={location.name} className="w-full h-full object-cover object-center" />
-              ) : (
-                <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }} />
-              )}
+              <PortraitImg
+                src={location.imageUrl}
+                alt={location.name}
+                className="absolute inset-0 w-full h-full object-cover object-center"
+                fallback={
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0A1628 0%, #111F33 60%, #0D2040 100%)' }} />
+                }
+              />
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, #0A1628 100%)' }} />
               <img src="/presidential-seal.svg" alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 opacity-[0.04] pointer-events-none select-none" />
               <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ backgroundColor: 'rgba(201,168,76,0.5)' }} />
